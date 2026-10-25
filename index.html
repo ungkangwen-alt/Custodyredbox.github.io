@@ -37,15 +37,77 @@
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: #0f0507; }
         ::-webkit-scrollbar-thumb { background: #3d121c; border-radius: 4px; }
+    
+        @media print {
+            body > *:not(#receipt-modal) { display: none !important; }
+            #receipt-modal { position: static !important; background: #fff !important; display: block !important; }
+            #receipt-modal * { color: #000 !important; background: #fff !important; border-color: #999 !important; box-shadow: none !important; }
+            #receipt-modal button { display: none !important; }
+            #receipt-modal .grid.grid-cols-3 { display: none !important; }
+        }
     </style>
 </head>
 <body class="h-full flex flex-col antialiased selection:bg-rose-500 selection:text-white">
 
+    <!-- AUTHENTICATION / LOGIN OVERLAY (MODAL VIEW) -->
+    <div id="auth-screen" class="fixed inset-0 z-50 bg-redbox-dark flex flex-col items-center justify-center p-4 overflow-y-auto">
+        <div class="w-full max-w-sm bg-redbox-card border border-redbox-border rounded-3xl p-6 space-y-5 shadow-2xl relative overflow-hidden">
+            <div class="absolute -top-12 -right-12 w-36 h-36 bg-red-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+            <!-- Logo / Cover Image Section -->
+            <div class="text-center space-y-3">
+                <div class="inline-block p-2 bg-gradient-to-br from-red-600/30 to-rose-900/30 rounded-2xl border border-red-500/30 shadow-lg">
+                    <img src="https://placehold.co/128x128/991b1b/ffffff?text=RED+BOX" 
+                         alt="RED BOX Logo Cover" 
+                         class="w-24 h-24 object-contain mx-auto rounded-xl shadow-md"
+                         onerror="this.src='https://placehold.co/128x128/991b1b/ffffff?text=RED+BOX'">
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-xl text-white tracking-wide">RED BOX KTV</h1>
+                    <p class="text-xs text-rose-400 font-medium tracking-wider mt-0.5" data-i18n="auth_title_sub">KTV 寄存酒管理系统 • BOTTLE KEEPER</p>
+                </div>
+            </div>
+
+            <!-- Login / Register Tab Switches -->
+            <div class="flex rounded-xl bg-redbox-dark p-1 border border-redbox-border text-xs font-semibold">
+                <button id="btn-auth-mode-login" type="button" onclick="setAuthMode('login')" class="flex-1 py-2 rounded-lg bg-red-600 text-white transition shadow">
+                    <span data-i18n="auth_tab_login">登录 ID</span>
+                </button>
+                <button id="btn-auth-mode-register" type="button" onclick="setAuthMode('register')" class="flex-1 py-2 rounded-lg text-gray-400 hover:text-white transition">
+                    <span data-i18n="auth_tab_register">注册新 ID</span>
+                </button>
+            </div>
+
+            <!-- Login / Register Form -->
+            <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-3 pt-1">
+                <div id="auth-field-name" class="hidden">
+                    <label class="block text-xs font-medium text-gray-300 mb-1" data-i18n="lbl_auth_name">Full Name / 真实姓名 *</label>
+                    <input type="text" id="auth-name" placeholder="e.g. Alex Wong" class="w-full bg-redbox-dark border border-redbox-border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-300 mb-1" data-i18n="lbl_auth_phone">Phone Number / 手机号码 ID *</label>
+                    <input type="tel" id="auth-phone" required placeholder="0123456789" class="w-full bg-redbox-dark border border-redbox-border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-300 mb-1" data-i18n="lbl_auth_pin">Account Password / 登录密码 (PIN) *</label>
+                    <input type="password" id="auth-pass" required maxlength="6" placeholder="••••••" class="w-full bg-redbox-dark border border-redbox-border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition tracking-widest">
+                </div>
+
+                <button type="submit" id="btn-auth-submit" class="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-red-900/40 transition flex items-center justify-center space-x-2 text-xs mt-2">
+                    <i class="fa-solid fa-right-to-bracket text-sm"></i>
+                    <span id="auth-submit-text" data-i18n="btn_login_now">立即登录</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- Top Header Bar -->
     <header class="bg-redbox-dark/90 backdrop-blur-md border-b border-redbox-border sticky top-0 z-40 px-4 py-3 flex items-center justify-between">
         <div class="flex items-center space-x-2.5">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-red-600 to-rose-700 flex items-center justify-center shadow-lg shadow-red-900/40 border border-red-500/30">
-                <i class="fa-solid fa-wine-bottle text-white text-sm"></i>
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-red-600 to-rose-700 flex items-center justify-center shadow-lg shadow-red-900/40 border border-red-500/30 overflow-hidden">
+                <img src="https://placehold.co/64x64/991b1b/ffffff?text=RB" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/64x64/991b1b/ffffff?text=RB'">
             </div>
             <div>
                 <h1 class="font-extrabold text-sm tracking-wide text-white flex items-center space-x-1.5">
@@ -57,6 +119,13 @@
         </div>
         
         <div class="flex items-center space-x-2">
+            <!-- User Status / Logout Badge -->
+            <button onclick="openAuthScreen()" class="bg-redbox-card hover:bg-redbox-border text-xs px-2.5 py-1.5 rounded-xl border border-redbox-border text-rose-400 transition flex items-center space-x-1.5 font-medium">
+                <i class="fa-solid fa-circle-user text-red-500 text-xs"></i>
+                <span id="header-user-name">Kelvin Wong</span>
+                <span id="header-role-badge" class="bg-red-600/30 text-rose-300 text-[10px] px-1.5 py-0.2 rounded border border-red-500/30 ml-1">Staff</span>
+            </button>
+
             <!-- Language Toggle Button -->
             <button onclick="toggleLanguage()" class="bg-redbox-card hover:bg-redbox-border text-xs px-2.5 py-1.5 rounded-xl border border-redbox-border text-gray-300 transition flex items-center space-x-1.5 font-medium">
                 <i class="fa-solid fa-globe text-red-500 text-xs"></i>
@@ -67,6 +136,7 @@
 
     <!-- Main Container -->
     <main class="flex-1 overflow-y-auto p-4 pb-24 max-w-xl mx-auto w-full space-y-4">
+        <div id="expiry-alert" class="hidden"></div>
 
         <!-- TAB 1: NEW DEPOSIT (存酒登记) -->
         <section id="tab-deposit" class="space-y-4 tab-content">
@@ -91,7 +161,7 @@
                         <input type="tel" id="dep-phone" required placeholder="0123456789" class="w-full bg-redbox-dark border border-redbox-border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition">
                     </div>
 
-                    <!-- Multiple liquor items container (Side-by-side brand, qty, unit type) -->
+                    <!-- Multiple liquor items container -->
                     <div class="space-y-2 pt-1">
                         <div class="flex items-center justify-between">
                             <label class="block text-xs font-medium text-gray-300" data-i18n="lbl_liquor_items">Liquor Brand & Qty (1-100 or 1%-100%) *</label>
@@ -113,7 +183,7 @@
                         <div>
                             <label class="block text-xs font-medium text-gray-300 mb-1" data-i18n="lbl_outlet">Outlet / 分店选择 *</label>
                             <select id="dep-outlet" class="w-full bg-redbox-dark border border-redbox-border rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-red-500 transition">
-                                <!-- Populated dynamically from outletList -->
+                                <!-- Populated dynamically -->
                             </select>
                         </div>
                     </div>
@@ -194,11 +264,8 @@
                 </div>
 
                 <div class="space-y-3 pt-1 border-t border-redbox-border/60">
-                    <button onclick="openScannerModal('withdraw')" class="w-full bg-redbox-dark hover:bg-redbox-border border border-redbox-border text-red-400 font-bold py-2.5 px-4 rounded-xl transition flex items-center justify-center space-x-2 text-xs">
-                        <i class="fa-solid fa-barcode"></i>
-                        <span data-i18n="btn_withdraw_scan">Scan Voucher Barcode / 扫码快速选择存酒</span>
-                    </button>
-
+                    
+                    <!-- 1. 当前取酒分店置顶选择 -->
                     <div>
                         <label class="block text-xs font-medium text-gray-300 mb-1" data-i18n="lbl_withdraw_outlet">Redemption Outlet / 当前取酒分店 *</label>
                         <select id="withdraw-outlet" class="w-full bg-redbox-dark border border-redbox-border rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-red-500 transition">
@@ -206,34 +273,58 @@
                         </select>
                     </div>
 
-                    <div>
-                        <label class="block text-xs font-medium text-gray-300 mb-1" data-i18n="lbl_select_bottle">Select Active Bottle / 选择在库酒水</label>
-                        <select id="withdraw-bottle-select" class="w-full bg-redbox-dark border border-redbox-border rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-red-500 transition">
-                            <!-- Populated dynamically -->
-                        </select>
+                    <!-- 2. 扫码或输入手机号验证身份 -->
+                    <div class="space-y-2 pt-1 border-t border-redbox-border/40">
+                        <label class="block text-xs font-medium text-gray-300" data-i18n="lbl_withdraw_search">Customer Phone or QR Scan / 顾客手机号或扫码查存酒 *</label>
+                        <div class="flex space-x-2">
+                            <input type="tel" id="withdraw-phone-input" placeholder="Enter phone number / 手机号" class="flex-1 bg-redbox-dark border border-redbox-border rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-red-500 transition">
+                            <button onclick="searchWithdrawBottles()" class="bg-red-600 hover:bg-red-500 text-white font-bold px-3.5 py-2.5 rounded-xl text-xs transition flex items-center space-x-1">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <span data-i18n="btn_withdraw_find">Find / 搜索</span>
+                            </button>
+                            <button onclick="openScannerModal('withdraw')" class="bg-redbox-dark hover:bg-redbox-border border border-redbox-border text-red-400 font-bold px-3 py-2.5 rounded-xl text-xs transition flex items-center space-x-1">
+                                <i class="fa-solid fa-camera"></i>
+                                <span data-i18n="btn_withdraw_scan_icon">Scan / 扫码</span>
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3">
+                    <!-- 初始未搜酒时的提示框 -->
+                    <div id="withdraw-prompt" class="bg-redbox-dark/40 border border-dashed border-redbox-border p-4 rounded-xl text-center text-xs text-gray-400 space-y-1">
+                        <i class="fa-solid fa-qrcode text-red-500/60 text-xl block mb-1"></i>
+                        <span>Scan customer QR or enter phone number above to reveal active bottles.</span>
+                        <p class="text-[10px] text-gray-500">（扫描顾客二维码或输入手机号后即可显示存酒信息）</p>
+                    </div>
+
+                    <!-- 3. 扫码或搜索后才出现的存酒信息与操作区域 -->
+                    <div id="withdraw-action-panel" class="hidden space-y-3 pt-2 border-t border-redbox-border/60">
+                        
+                        <!-- 顾客存酒概览提醒卡片 -->
+                        <div id="withdraw-cust-info" class="bg-red-950/20 border border-red-900/40 p-3 rounded-xl text-xs flex justify-between items-center">
+                            <div>
+                                <span class="text-gray-400 text-[11px] block">Verified Customer / 已匹配顾客:</span>
+                                <strong id="withdraw-cust-name" class="text-white text-sm">--</strong>
+                            </div>
+                            <span id="withdraw-cust-badge" class="bg-emerald-950 text-emerald-400 border border-emerald-800/50 text-[10px] px-2 py-0.5 rounded">Active Vault</span>
+                        </div>
+
                         <div>
-                            <label class="block text-xs font-medium text-gray-300 mb-1" data-i18n="lbl_withdraw_qty">Quantity to Take / 取走数量</label>
-                            <div class="flex items-center space-x-2">
-                                <input type="number" id="withdraw-qty" min="1" max="100" value="1" class="w-20 bg-redbox-dark border border-redbox-border rounded-xl px-2.5 py-2.5 text-sm text-white text-center focus:outline-none focus:border-red-500 transition">
-                                <select id="withdraw-unit-type" class="flex-1 bg-redbox-dark border border-redbox-border rounded-xl px-2 py-2.5 text-xs text-white focus:outline-none focus:border-red-500 transition">
-                                    <option value="bottle" data-i18n="opt_unit_bottle">Bottles / 整瓶</option>
-                                    <option value="percent" data-i18n="opt_unit_percent">% (Percentage / 百分比)</option>
-                                </select>
+                            <label class="block text-xs font-medium text-gray-300 mb-1.5" data-i18n="lbl_select_bottle">Select Liquor to Withdraw / 勾选需取出的具体酒水及数量 *</label>
+                            <div id="withdraw-liquor-list-container" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                                <!-- Populated dynamically -->
                             </div>
                         </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-300 mb-1" data-i18n="lbl_staff_pin">Staff PIN / 店员密码</label>
-                            <input type="password" id="withdraw-staff-pin" maxlength="4" placeholder="••••" class="w-full bg-redbox-dark border border-redbox-border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition tracking-widest text-center">
-                        </div>
-                    </div>
 
-                    <button onclick="handleWithdraw()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-emerald-900/30 transition flex items-center justify-center space-x-2 text-xs">
-                        <i class="fa-solid fa-check-circle text-sm"></i>
-                        <span data-i18n="btn_confirm_withdraw">Verify PIN & Deduct Bottle</span>
-                    </button>
+                        <div class="pt-2 border-t border-redbox-border/50">
+                            <label class="block text-xs font-medium text-gray-300 mb-1" data-i18n="lbl_staff_pin">Staff PIN / 店员密码 *</label>
+                            <input type="password" id="withdraw-staff-pin" maxlength="6" placeholder="••••" class="w-full bg-redbox-dark border border-redbox-border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition tracking-widest text-center">
+                        </div>
+
+                        <button onclick="handleWithdraw()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-emerald-900/30 transition flex items-center justify-center space-x-2 text-xs mt-2">
+                            <i class="fa-solid fa-check-circle text-sm"></i>
+                            <span data-i18n="btn_confirm_withdraw">Verify PIN & Deduct Selected Bottle(s)</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -293,107 +384,178 @@
 
         <!-- TAB 5: ADMIN / MANAGEMENT (管理后台) -->
         <section id="tab-admin" class="space-y-4 tab-content hidden">
-            <!-- Liquor Brand Management Section -->
-            <div class="bg-redbox-card p-4 rounded-2xl border border-redbox-border space-y-3 shadow-xl">
-                <div>
-                    <h2 class="font-bold text-red-500 flex items-center space-x-2">
-                        <i class="fa-solid fa-wine-bottle"></i>
-                        <span data-i18n="liquor_header">Liquor Brand Management (酒水名称与品牌管理)</span>
-                    </h2>
-                    <p class="text-xs text-gray-400 mt-0.5" data-i18n="liquor_desc">Add and manage liquor brands available for deposit.</p>
+            <!-- Admin Lock Screen Overlay if not Admin -->
+            <div id="admin-auth-panel" class="bg-redbox-card p-6 rounded-2xl border border-redbox-border text-center space-y-4 shadow-xl">
+                <div class="w-12 h-12 rounded-2xl bg-red-600/20 text-red-500 flex items-center justify-center mx-auto border border-red-500/30">
+                    <i class="fa-solid fa-lock text-xl"></i>
                 </div>
-
-                <form id="liquor-form" onsubmit="handleAddLiquor(event)" class="space-y-3 pt-1 border-t border-redbox-border/60">
-                    <div class="pt-2">
-                        <label class="block text-xs font-medium text-gray-300 mb-1" data-i18n="lbl_liquor_name">Liquor Name / 酒水全称 *</label>
-                        <input type="text" id="liquor-name" required placeholder="e.g. Martell Cordon Bleu (马爹利蓝带)" class="w-full bg-redbox-dark border border-redbox-border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition">
-                    </div>
-                    <button type="submit" class="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold py-2 px-4 rounded-xl shadow-lg shadow-red-900/30 transition flex items-center justify-center space-x-2 text-xs">
-                        <i class="fa-solid fa-plus"></i>
-                        <span data-i18n="btn_add_liquor">Add New Liquor Brand / 添加酒水名称</span>
+                <div>
+                    <h2 class="font-bold text-white text-base" data-i18n="adm_lock_title">管理员权限验证</h2>
+                    <p class="text-xs text-gray-400 mt-1" data-i18n="adm_lock_desc">员工仅支持存/查/取/记录功能。进入后台管理需输入管理员密码。</p>
+                </div>
+                <form onsubmit="verifyAdminAccess(event)" class="space-y-3 max-w-xs mx-auto">
+                    <input type="password" id="admin-passcode-input" maxlength="6" placeholder="输入管理员密码" class="w-full bg-redbox-dark border border-redbox-border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 text-center tracking-widest">
+                    <button type="submit" class="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition shadow-lg" data-i18n="adm_unlock">
+                        解锁管理后台
                     </button>
                 </form>
-
-                <div class="pt-2">
-                    <h3 class="font-bold text-xs text-gray-300 uppercase tracking-widest mb-2" data-i18n="lbl_active_liquors">Active Liquor Brands List (已注册酒水品牌)</h3>
-                    <div id="liquor-list" class="space-y-2">
-                        <!-- Populated dynamically -->
-                    </div>
-                </div>
             </div>
 
-            <!-- Outlet Management Section -->
-            <div class="bg-redbox-card p-4 rounded-2xl border border-redbox-border space-y-3 shadow-xl">
-                <div>
-                    <h2 class="font-bold text-red-500 flex items-center space-x-2">
-                        <i class="fa-solid fa-store"></i>
-                        <span data-i18n="outlet_header">Outlet Management (分店门店管理)</span>
-                    </h2>
-                    <p class="text-xs text-gray-400 mt-0.5" data-i18n="outlet_desc">Add and manage KTV branches / store locations.</p>
-                </div>
-
-                <form id="outlet-form" onsubmit="handleAddOutlet(event)" class="space-y-3 pt-1 border-t border-redbox-border/60">
-                    <div class="grid grid-cols-2 gap-3 pt-2">
-                        <div>
-                            <label class="block text-xs font-medium text-gray-300 mb-1" data-i18n="lbl_outlet_name">Store Name / 分店名称 *</label>
-                            <input type="text" id="outlet-name" required placeholder="e.g. RED BOX Bukit Bintang" class="w-full bg-redbox-dark border border-redbox-border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-300 mb-1" data-i18n="lbl_outlet_code">Store Code / 简写代码 *</label>
-                            <input type="text" id="outlet-code" required placeholder="KL-BB" class="w-full bg-redbox-dark border border-redbox-border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition uppercase">
-                        </div>
-                    </div>
-                    <button type="submit" class="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold py-2 px-4 rounded-xl shadow-lg shadow-red-900/30 transition flex items-center justify-center space-x-2 text-xs">
-                        <i class="fa-solid fa-plus"></i>
-                        <span data-i18n="btn_add_outlet">Add New Outlet / 添加分店</span>
+            <!-- Admin Content Container (Hidden until unlocked) -->
+            <div id="admin-content-panel" class="hidden space-y-4">
+                <div class="flex items-center justify-between bg-red-950/30 border border-red-900/50 p-3 rounded-2xl text-xs">
+                    <span class="text-rose-300 font-medium flex items-center space-x-1.5">
+                        <i class="fa-solid fa-shield-halved text-red-500"></i>
+                        <span data-i18n="adm_logged_in">已登录管理员模式</span>
+                    </span>
+                    <button onclick="lockAdminAccess()" class="bg-redbox-dark hover:bg-redbox-border text-gray-300 px-2.5 py-1 rounded-lg border border-redbox-border text-[11px] transition" data-i18n="adm_exit">
+                        退出管理模式
                     </button>
-                </form>
-
-                <div class="pt-2">
-                    <h3 class="font-bold text-xs text-gray-300 uppercase tracking-widest mb-2" data-i18n="lbl_active_outlets">Active Outlets List (已注册分店)</h3>
-                    <div id="outlet-list" class="space-y-2">
-                        <!-- Populated dynamically -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Staff PIN Management Section -->
-            <div class="bg-redbox-card p-4 rounded-2xl border border-redbox-border space-y-3 shadow-xl">
-                <div>
-                    <h2 class="font-bold text-red-500 flex items-center space-x-2">
-                        <i class="fa-solid fa-user-shield"></i>
-                        <span data-i18n="admin_header">Admin & Staff PINs (员工权限与PIN管理)</span>
-                    </h2>
-                    <p class="text-xs text-gray-400 mt-0.5" data-i18n="admin_desc">Authorize staff members and manage their 4-digit security PIN codes for withdrawals.</p>
                 </div>
 
-                <form id="staff-form" onsubmit="handleAddStaff(event)" class="space-y-3 pt-1 border-t border-redbox-border/60">
-                    <div class="grid grid-cols-2 gap-3 pt-2">
-                        <div>
-                            <label class="block text-xs font-medium text-gray-300 mb-1" data-i18n="lbl_staff_name">Staff Name / 员工姓名 *</label>
-                            <input type="text" id="staff-name" required placeholder="e.g. Ah Seng" class="w-full bg-redbox-dark border border-redbox-border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-300 mb-1" data-i18n="lbl_staff_code">4-Digit PIN / 4位密码 *</label>
-                            <input type="password" id="staff-pin" required maxlength="4" placeholder="8888" class="w-full bg-redbox-dark border border-redbox-border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition tracking-widest text-center">
-                        </div>
-                    </div>
+                <!-- 1. 管理员密码修改 Section -->
+                <div class="bg-redbox-card p-4 rounded-2xl border border-redbox-border space-y-3 shadow-xl">
                     <div>
-                        <label class="block text-xs font-medium text-gray-300 mb-1" data-i18n="lbl_staff_role">Role / 职位权限</label>
-                        <input type="text" id="staff-role" placeholder="Captain / Supervisor" class="w-full bg-redbox-dark border border-redbox-border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition">
+                        <h2 class="font-bold text-red-500 flex items-center space-x-2 text-sm">
+                            <i class="fa-solid fa-key"></i>
+                            <span data-i18n="adm_pw_title">Admin Password Management (修改管理员密码)</span>
+                        </h2>
+                        <p class="text-xs text-gray-400 mt-0.5" data-i18n="adm_pw_desc">Change the master administrator PIN.</p>
                     </div>
-                    <button type="submit" class="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold py-2 px-4 rounded-xl shadow-lg shadow-red-900/30 transition flex items-center justify-center space-x-2 text-xs">
-                        <i class="fa-solid fa-user-plus"></i>
-                        <span data-i18n="btn_add_staff">Add Authorized Staff PIN</span>
-                    </button>
-                </form>
 
-                <div class="pt-2">
-                    <h3 class="font-bold text-xs text-gray-300 uppercase tracking-widest mb-2" data-i18n="lbl_active_staff">Authorized Staff List (已授权员工)</h3>
-                    <div id="staff-list" class="space-y-2">
-                        <!-- Populated dynamically -->
+                    <form onsubmit="handleChangeAdminPin(event)" class="space-y-3 pt-1 border-t border-redbox-border/60">
+                        <div class="grid grid-cols-2 gap-3 pt-2">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-300 mb-1" data-i18n="adm_old_pin">Current PIN / 旧管理员密码 *</label>
+                                <input type="password" id="admin-old-pin" required maxlength="6" placeholder="旧密码" class="w-full bg-redbox-dark border border-redbox-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500 text-center tracking-widest">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-300 mb-1" data-i18n="adm_new_pin">New PIN / 新管理员密码 *</label>
+                                <input type="password" id="admin-new-pin" required maxlength="6" placeholder="新密码" class="w-full bg-redbox-dark border border-redbox-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500 text-center tracking-widest">
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold py-2 px-4 rounded-xl shadow-lg shadow-red-900/30 transition flex items-center justify-center space-x-2 text-xs">
+                            <i class="fa-solid fa-check-double"></i>
+                            <span data-i18n="adm_save_pin">Update Admin Master PIN / 保存新管理员密码</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- 2. Staff PIN Management Section -->
+                <div class="bg-redbox-card p-4 rounded-2xl border border-redbox-border space-y-3 shadow-xl">
+                    <div>
+                        <h2 class="font-bold text-red-500 flex items-center space-x-2 text-sm">
+                            <i class="fa-solid fa-user-shield"></i>
+                            <span data-i18n="admin_header">Admin & Staff PINs (员工权限与密码管理)</span>
+                        </h2>
+                        <p class="text-xs text-gray-400 mt-0.5" data-i18n="admin_desc">Authorize staff members and manage their security PIN codes for withdrawals.</p>
+                    </div>
+
+                    <form id="staff-form" onsubmit="handleAddStaff(event)" class="space-y-3 pt-1 border-t border-redbox-border/60">
+                        <div class="grid grid-cols-2 gap-3 pt-2">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-300 mb-1" data-i18n="lbl_staff_name">Staff Name / 员工姓名 *</label>
+                                <input type="text" id="staff-name" required placeholder="e.g. Ah Seng" class="w-full bg-redbox-dark border border-redbox-border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-300 mb-1" data-i18n="lbl_staff_code">4-Digit PIN / 4位密码 *</label>
+                                <input type="password" id="staff-pin" required maxlength="6" placeholder="••••" class="w-full bg-redbox-dark border border-redbox-border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition tracking-widest text-center">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-300 mb-1" data-i18n="lbl_staff_role">Role / 职位权限</label>
+                            <input type="text" id="staff-role" placeholder="Captain / Supervisor" class="w-full bg-redbox-dark border border-redbox-border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition">
+                        </div>
+                        <button type="submit" class="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold py-2 px-4 rounded-xl shadow-lg shadow-red-900/30 transition flex items-center justify-center space-x-2 text-xs">
+                            <i class="fa-solid fa-user-plus"></i>
+                            <span data-i18n="btn_add_staff">Add Authorized Staff PIN</span>
+                        </button>
+                    </form>
+
+                    <div class="pt-2">
+                        <h3 class="font-bold text-xs text-gray-300 uppercase tracking-widest mb-2" data-i18n="lbl_active_staff">Authorized Staff List (已授权员工及密码重置)</h3>
+                        <div id="staff-list" class="space-y-2">
+                            <!-- Populated dynamically -->
+                        </div>
                     </div>
                 </div>
+
+                <!-- 3. 酒品名称管理 Section -->
+                <div class="bg-redbox-card p-4 rounded-2xl border border-redbox-border space-y-3 shadow-xl">
+                    <div>
+                        <h2 class="font-bold text-red-500 flex items-center space-x-2 text-sm">
+                            <i class="fa-solid fa-wine-glass"></i>
+                            <span data-i18n="liquor_mgr_header">Liquor Brands Management (酒品名称管理)</span>
+                        </h2>
+                        <p class="text-xs text-gray-400 mt-0.5" data-i18n="liquor_mgr_desc">Add or remove available liquor brands for bottle deposit options.</p>
+                    </div>
+
+                    <form id="liquor-form" onsubmit="handleAddLiquor(event)" class="space-y-3 pt-1 border-t border-redbox-border/60">
+                        <div class="pt-2">
+                            <label class="block text-xs font-medium text-gray-300 mb-1" data-i18n="lbl_liquor_name">Liquor Name / 酒品名称 *</label>
+                            <input type="text" id="liquor-name" required placeholder="e.g. Blue Label / Hennessy XO" class="w-full bg-redbox-dark border border-redbox-border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition">
+                        </div>
+                        <button type="submit" class="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold py-2 px-4 rounded-xl shadow-lg shadow-red-900/30 transition flex items-center justify-center space-x-2 text-xs">
+                            <i class="fa-solid fa-plus"></i>
+                            <span data-i18n="btn_add_liquor">Add Liquor Brand / 添加酒名称</span>
+                        </button>
+                    </form>
+
+                    <div class="pt-2">
+                        <h3 class="font-bold text-xs text-gray-300 uppercase tracking-widest mb-2" data-i18n="lbl_active_liquors">Active Liquor List (已有酒品列表)</h3>
+                        <div id="liquor-list" class="space-y-2">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3.5 Outlet Statistics -->
+                <div class="bg-redbox-card p-4 rounded-2xl border border-redbox-border space-y-3 shadow-xl">
+                    <div>
+                        <h2 class="font-bold text-red-500 flex items-center space-x-2 text-sm">
+                            <i class="fa-solid fa-chart-column"></i>
+                            <span data-i18n="stats_title">Outlet Statistics</span>
+                        </h2>
+                        <p class="text-xs text-gray-400 mt-0.5" data-i18n="stats_desc">Overview of vouchers and stock per outlet.</p>
+                    </div>
+                    <div id="outlet-stats" class="space-y-2 pt-1 border-t border-redbox-border/60"></div>
+                </div>
+
+                <!-- 4. Outlet Management Section -->
+                <div class="bg-redbox-card p-4 rounded-2xl border border-redbox-border space-y-3 shadow-xl">
+                    <div>
+                        <h2 class="font-bold text-red-500 flex items-center space-x-2 text-sm">
+                            <i class="fa-solid fa-store"></i>
+                            <span data-i18n="outlet_header">Outlet Management (分店门店管理)</span>
+                        </h2>
+                        <p class="text-xs text-gray-400 mt-0.5" data-i18n="outlet_desc">Add and manage KTV branches / store locations.</p>
+                    </div>
+
+                    <form id="outlet-form" onsubmit="handleAddOutlet(event)" class="space-y-3 pt-1 border-t border-redbox-border/60">
+                        <div class="grid grid-cols-2 gap-3 pt-2">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-300 mb-1" data-i18n="lbl_outlet_name">Store Name / 分店名称 *</label>
+                                <input type="text" id="outlet-name" required placeholder="e.g. RED BOX Bukit Bintang" class="w-full bg-redbox-dark border border-redbox-border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-300 mb-1" data-i18n="lbl_outlet_code">Store Code / 简写代码 *</label>
+                                <input type="text" id="outlet-code" required placeholder="KL-BB" class="w-full bg-redbox-dark border border-redbox-border rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-red-500 transition uppercase">
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold py-2 px-4 rounded-xl shadow-lg shadow-red-900/30 transition flex items-center justify-center space-x-2 text-xs">
+                            <i class="fa-solid fa-plus"></i>
+                            <span data-i18n="btn_add_outlet">Add New Outlet / 添加分店</span>
+                        </button>
+                    </form>
+
+                    <div class="pt-2">
+                        <h3 class="font-bold text-xs text-gray-300 uppercase tracking-widest mb-2" data-i18n="lbl_active_outlets">Active Outlets List (已注册分店)</h3>
+                        <div id="outlet-list" class="space-y-2">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </section>
 
@@ -423,6 +585,42 @@
         </button>
     </nav>
 
+    <!-- EDIT STAFF PIN MODAL -->
+    <div id="edit-staff-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-redbox-card border border-redbox-border w-full max-w-xs rounded-3xl p-5 space-y-4 text-center shadow-2xl relative">
+            <div class="flex items-center justify-between border-b border-redbox-border pb-3">
+                <h3 class="font-bold text-white text-xs flex items-center space-x-2">
+                    <i class="fa-solid fa-user-pen text-red-500"></i>
+                    <span>重置员工密码 (Reset Staff PIN)</span>
+                </h3>
+                <button onclick="closeEditStaffModal()" class="text-gray-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleSaveStaffPin(event)" class="space-y-3 text-left">
+                <input type="hidden" id="edit-staff-id">
+                <div>
+                    <label class="block text-[11px] font-medium text-gray-300 mb-1">员工姓名 / Staff Name</label>
+                    <input type="text" id="edit-staff-name" disabled class="w-full bg-redbox-dark/60 border border-redbox-border rounded-xl px-3 py-2 text-xs text-gray-400 cursor-not-allowed">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-medium text-gray-300 mb-1">新密码 (New PIN) *</label>
+                    <input type="password" id="edit-staff-pin-input" required maxlength="6" placeholder="输入新密码" class="w-full bg-redbox-dark border border-redbox-border rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500 text-center tracking-widest font-mono">
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 pt-2">
+                    <button type="button" onclick="closeEditStaffModal()" class="bg-redbox-dark hover:bg-redbox-border border border-redbox-border text-gray-300 py-2 rounded-xl text-xs">
+                        取消
+                    </button>
+                    <button type="submit" class="bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold py-2 rounded-xl text-xs shadow-lg shadow-red-900/30">
+                        保存修改
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- QR VOUCHER RECEIPT MODAL -->
     <div id="receipt-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-redbox-card border border-redbox-border w-full max-w-sm rounded-3xl p-6 space-y-4 text-center shadow-2xl relative overflow-hidden animate-fadeIn">
@@ -445,7 +643,7 @@
                 <p class="text-[11px] text-gray-400" data-i18n="modal_subtitle">Show this QR code to staff for fast check-in.</p>
             </div>
 
-            <!-- Standard Rendered QR Code Container -->
+            <!-- QR Code Container -->
             <div class="bg-white p-4 rounded-2xl inline-block shadow-inner border border-gray-200 my-1">
                 <div id="qrcode" class="flex justify-center items-center"></div>
             </div>
@@ -459,10 +657,14 @@
 
             <img id="modal-bottle-thumb" class="hidden w-full h-20 object-cover rounded-xl border border-redbox-border">
 
-            <div class="grid grid-cols-2 gap-2.5 pt-1">
+            <div class="grid grid-cols-3 gap-2.5 pt-1">
                 <button onclick="shareReceipt()" class="bg-redbox-dark hover:bg-redbox-border border border-redbox-border text-white py-2.5 px-4 rounded-xl text-xs font-semibold transition flex items-center justify-center space-x-1.5">
                     <i class="fa-solid fa-share-nodes text-red-500"></i>
                     <span data-i18n="btn_share">Share</span>
+                </button>
+                <button onclick="window.print()" class="bg-redbox-dark hover:bg-redbox-border border border-redbox-border text-white py-2.5 px-4 rounded-xl text-xs font-semibold transition flex items-center justify-center space-x-1.5">
+                    <i class="fa-solid fa-print text-red-500"></i>
+                    <span data-i18n="btn_print">Print</span>
                 </button>
                 <button onclick="closeReceiptModal()" class="bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white py-2.5 px-4 rounded-xl text-xs font-semibold transition shadow-lg shadow-red-900/30">
                     <span data-i18n="btn_done">Done</span>
@@ -471,7 +673,7 @@
         </div>
     </div>
 
-    <!-- CAMERA SCANNER MODAL WITH FALLBACK -->
+    <!-- CAMERA SCANNER MODAL -->
     <div id="scanner-modal" class="fixed inset-0 z-50 bg-black/95 backdrop-blur-md hidden flex flex-col items-center justify-center p-4">
         <div class="w-full max-w-md bg-redbox-card border border-redbox-border rounded-3xl p-5 space-y-4 shadow-2xl relative">
             <div class="flex items-center justify-between border-b border-redbox-border pb-3">
@@ -489,7 +691,7 @@
             <div class="space-y-2">
                 <p class="text-[11px] text-center text-gray-400">Position the bottle QR code inside the frame or select a quick mock bottle below.</p>
                 <div id="scanner-mock-list" class="grid grid-cols-2 gap-2 pt-1">
-                    <!-- Populated dynamically for instant testing if camera blocked -->
+                    <!-- Populated dynamically -->
                 </div>
             </div>
 
@@ -505,205 +707,750 @@
         <span id="toast-msg">Success</span>
     </div>
 
-    <!-- Application Script Logic -->
+    <!-- Application Logic Script -->
     <script>
-        const i18n = {
-            en: {
-                app_subtitle: "S I N C E 2 0 0 0 • 寄存酒系统",
-                lang_label: "华文",
-                dep_header: "New Bottle Deposit",
-                dep_desc: "Record customer liquor securely with instant QR voucher generation.",
-                lbl_cust_name: "Customer Name / 顾客姓名 *",
-                lbl_phone: "Phone Number / 手机号码 *",
-                lbl_liquor_items: "Liquor Brand & Qty (1-100 or 1%-100%) *",
-                btn_add_another: "Add Another Liquor",
-                lbl_room: "Room No / 包厢号",
-                lbl_outlet: "Outlet / 分店选择 *",
-                lbl_expiry: "Expiration (DD/MM/YY) / 有效期",
-                lbl_photo: "Bottle Label Photo / 防伪标签拍照",
-                photo_label: "Tap to capture label / 点击拍照",
-                btn_gen_deposit: "Confirm Deposit & Generate QR",
-                lookup_header: "Lookup & Scan Vault",
-                lookup_desc: "Search customer inventory by phone or scan QR code.",
-                or_divider: "OR QUICK SCAN / 或快速扫描",
-                btn_scan_qr: "Open Camera Scanner / 开启摄像头扫码",
-                no_search_yet: "Enter phone number or scan QR to check active bottles.",
-                withdraw_header: "Bottle Withdrawal",
-                withdraw_desc: "Deduct opened or finished bottles with authorized staff PIN.",
-                btn_withdraw_scan: "Scan Voucher Barcode / 扫码快速选择存酒",
-                lbl_withdraw_outlet: "Redemption Outlet / 当前取酒分店 *",
-                lbl_select_bottle: "Select Active Bottle / 选择在库酒水",
-                lbl_withdraw_qty: "Quantity / 取走数量与单位",
-                opt_unit_bottle: "Bottles (1-100) / 整瓶",
-                opt_unit_percent: "% (1-100%) / 百分比",
-                lbl_staff_pin: "Staff PIN / 店员密码",
-                btn_confirm_withdraw: "Verify PIN & Deduct Bottle",
-                sec_note_title: "Security Audit Notice",
-                sec_note_desc: "All withdrawals require supervisor PIN code. Logs are permanently recorded for manager auditing.",
-                hist_header: "Activity & Audit Log",
-                hist_desc: "Real-time tracking of active deposits and past redemptions.",
-                lbl_filter_expiry: "Filter Expiry by Month / 查看过期月份",
-                lbl_filter_outlet: "Filter Outlet / 分店",
-                opt_all_months: "All Months / 所有",
-                btn_export: "Export Log",
-                liquor_header: "Liquor Brand Management",
-                liquor_desc: "Add and manage liquor brands available for deposit.",
-                lbl_liquor_name: "Liquor Name / 酒水名称 *",
-                btn_add_liquor: "Add New Liquor Brand",
-                lbl_active_liquors: "Active Liquor Brands List",
-                outlet_header: "Outlet Management",
-                outlet_desc: "Add and manage KTV branches / store locations.",
-                lbl_outlet_name: "Store Name / 分店名称 *",
-                lbl_outlet_code: "Store Code / 简写代码 *",
-                btn_add_outlet: "Add New Outlet",
-                lbl_active_outlets: "Active Outlets List",
-                admin_header: "Admin & Staff PINs",
-                admin_desc: "Authorize staff members and manage their 4-digit security PIN codes for withdrawals.",
-                lbl_staff_name: "Staff Name / 员工姓名 *",
-                lbl_staff_code: "4-Digit PIN / 4位密码 *",
-                lbl_staff_role: "Role / 职位权限",
-                btn_add_staff: "Add Authorized Staff PIN",
-                lbl_active_staff: "Authorized Staff List",
-                nav_deposit: "Deposit",
-                nav_lookup: "Lookup",
-                nav_withdraw: "Withdraw",
-                nav_history: "History",
-                nav_admin: "Admin",
-                modal_title: "RED BOX Deposit Voucher",
-                modal_subtitle: "Show this QR code to staff for fast check-in.",
-                btn_share: "Share",
-                btn_done: "Done"
+        // Data Stores
+        let bottleVault = [
+            {
+                id: 'RB-1394',
+                name: 'Kelvin Wong',
+                phone: '0123456789',
+                items: [
+                    { id: 'item-1', brand: 'Chivas Regal 12 Years', qty: 2, qtyType: 'bottle' },
+                    { id: 'item-2', brand: 'Martell VSOP', qty: 70, qtyType: 'percent' },
+                    { id: 'item-3', brand: 'Martell Cordon Bleu', qty: 1, qtyType: 'bottle' },
+                    { id: 'item-4', brand: 'Hennessy XO', qty: 50, qtyType: 'percent' }
+                ],
+                bottle: 'Chivas Regal 12 Years (x2 btl), Martell VSOP (70%), Martell Cordon Bleu (x1 btl), Hennessy XO (50%)',
+                bottleFormatted: `<div class="mt-1 font-mono text-[11px] bg-redbox-dark/60 p-2 rounded-lg border border-redbox-border/50 text-gray-200">1. Chivas Regal 12 Years x 2 btl<br>2. Martell VSOP x 70%<br>3. Martell Cordon Bleu x 1 btl<br>4. Hennessy XO x 50%</div>`,
+                qty: 4,
+                qtyType: 'bottle',
+                room: 'VIP 03',
+                outlet: 'RED BOX The Gardens',
+                expiry: '2026-12-31',
+                date: '2026-10-24',
+                status: 'Active',
+                photo: null
             },
+            {
+                id: 'RB-8821',
+                name: 'Jessica Lee',
+                phone: '0198765432',
+                items: [
+                    { id: 'item-1', brand: 'Martell VSOP', qty: 80, qtyType: 'percent' }
+                ],
+                bottle: 'Martell VSOP (x80%)',
+                bottleFormatted: 'Martell VSOP (x80%)',
+                qty: 80,
+                qtyType: 'percent',
+                room: 'VIP 12',
+                outlet: 'RED BOX The Gardens',
+                expiry: '2026-11-15',
+                date: '2026-10-18',
+                status: 'Active',
+                photo: null
+            }
+        ];
+
+        let historyLog = [
+            {
+                id: 'LOG-101',
+                time: '24/10/26, 14:30:00',
+                type: 'DEPOSIT',
+                outlet: 'RED BOX The Gardens',
+                vaultIds: ['RB-1394'],
+                desc: 'Kelvin Wong deposited 4 liquor items at RED BOX The Gardens'
+            }
+        ];
+
+        let liquorBrands = [
+            'Chivas Regal 12 Years',
+            'Martell VSOP',
+            'Martell Cordon Bleu',
+            'Hennessy XO',
+            'Royal Salute 21',
+            'Macallan 12 Years'
+        ];
+
+        let outletList = [
+            { id: 'O-1', name: 'RED BOX The Gardens', code: 'KL-TG' },
+            { id: 'O-2', name: 'RED BOX Pavilion KL', code: 'KL-PAV' },
+            { id: 'O-3', name: 'RED BOX Gurney Plaza', code: 'PG-GP' }
+        ];
+
+        let staffList = [
+            { id: 'S-1', name: 'Ah Seng', pinHash: '165edf0cc19ad4c67bc522ab535ff39777cd80ecd93c99898c6a1eef92503c2b', role: 'Supervisor' },
+            { id: 'S-2', name: 'Xiao Ming', pinHash: '96f7cd9615444984cff6653d900b0dc96531d078da807cdf76996f579d90fe01', role: 'Captain' }
+        ];
+
+        let currentLang = 'zh';
+        let html5QrCode = null;
+        let activeScannerContext = 'lookup';
+        let capturedPhotoData = null;
+        let currentGeneratedId = '';
+
+        let currentAuthMode = 'login';
+        let loggedUser = {
+            name: 'Kelvin Wong',
+            phone: '0123456789'
+        };
+
+        let isAdminAuthenticated = false;
+        let adminPinHash = '0058c7ef6ed8f227359412fe98ef77b5fc6045d35a673d9c40e90da0fb94eb67';
+
+        const i18n = {
             zh: {
-                app_subtitle: "S I N C E 2 0 0 0 • 寄存酒系统",
-                lang_label: "English",
-                dep_header: "新建KTV存酒登记",
-                dep_desc: "安全记录顾客洋酒信息并绑定分店与包厢号，自动生成标准电子存酒二维码。",
-                lbl_cust_name: "顾客姓名 *",
-                lbl_phone: "手机号码 *",
-                lbl_liquor_items: "酒水品牌与数量 (1~100或1%~100%) *",
-                btn_add_another: "增加另一种酒",
-                lbl_room: "包厢号",
-                lbl_outlet: "所属分店 *",
-                lbl_expiry: "到期时间 (日/月/年)",
-                lbl_photo: "瓶身防伪标签拍照",
-                photo_label: "点击拍照或上传标签照片",
-                btn_gen_deposit: "确认存酒并生成二维码凭证",
-                lookup_header: "库存查询与扫码核销",
-                lookup_desc: "通过顾客手机号检索或摄像头扫描存酒二维码快速核查。",
-                or_divider: "或 扫码识别",
-                btn_scan_qr: "开启摄像头扫码 / 扫描存酒二维码",
-                no_search_yet: "请输入手机号或点击扫码以检索在库酒水。",
-                withdraw_header: "取酒与消耗核销",
-                withdraw_desc: "选择当前取酒分店并输入授权店员密码后，扣减包厢开瓶或带走的酒水量。",
-                btn_withdraw_scan: "摄像头扫码快速选择存酒",
-                lbl_withdraw_outlet: "当前取酒门店 / Redemption Outlet *",
-                lbl_select_bottle: "选择有效在库酒水",
-                lbl_withdraw_qty: "取走数量/百分比 (1~100)",
-                opt_unit_bottle: "整瓶 (1-100 瓶)",
-                opt_unit_percent: "% 百分比剩余 (1-100%)",
-                lbl_staff_pin: "店员安全密码 (PIN)",
-                btn_confirm_withdraw: "验证密码并扣减存酒",
-                sec_note_title: "安全审计提示",
-                sec_note_desc: "所有包厢取酒均需录入店员PIN码，并自动存入财务与库存审计日志。",
-                hist_header: "存取酒流水与分店过期查询",
-                hist_desc: "实时查看分店流水，可按分店及月份筛选即将过期的客酒。",
-                lbl_filter_expiry: "按过期月份",
-                lbl_filter_outlet: "按分店筛选",
-                opt_all_months: "所有月份 / All",
-                btn_export: "导出流水",
-                liquor_header: "酒水名称与品牌管理",
-                liquor_desc: "在此添加、删除或管理系统内可供顾客寄存的洋酒品牌与酒水名称。",
-                lbl_liquor_name: "酒水全称 *",
-                btn_add_liquor: "添加新酒水品牌",
-                lbl_active_liquors: "已注册酒水品牌列表",
-                outlet_header: "分店门店管理 (Outlet Management)",
-                outlet_desc: "在此添加或删除KTV分店名称，供存酒与取酒时关联对应门店。",
-                lbl_outlet_name: "分店名称 *",
-                lbl_outlet_code: "分店代号 *",
-                btn_add_outlet: "添加新分店",
-                lbl_active_outlets: "已注册分店列表",
-                admin_header: "管理员与员工PIN码设置",
-                admin_desc: "在此添加、删除或管理有权进行取酒核销的员工账号与4位数安全密码。",
-                lbl_staff_name: "员工姓名 *",
-                lbl_staff_code: "4位数字PIN码 *",
-                lbl_staff_role: "职位级别",
-                btn_add_staff: "添加员工授权PIN码",
-                lbl_active_staff: "已授权员工列表",
+                lang_label: 'English',
+                app_subtitle: 'S I N C E 2 0 0 0 • 寄存酒系统',
+                dep_header: '新建KTV存酒登记',
+                dep_desc: '记录顾客酒水信息并即时生成高精存酒二维码凭证。',
+                lbl_cust_name: '顾客姓名 *',
+                lbl_phone: '手机号码 *',
+                lbl_liquor_items: '酒水名称与数量 (1-100 或 1%-100%) *',
+                btn_add_another: '增加一种酒',
+                lbl_room: '包厢号',
+                lbl_outlet: '分店选择 *',
+                lbl_expiry: '有效期',
+                lbl_photo: '防伪标签拍照',
+                photo_label: '点击拍照记录酒瓶标签',
+                btn_gen_deposit: '确认存酒并生成QR凭证',
+                lookup_header: '库存查询与扫码核销',
+                lookup_desc: '可按手机号快速查询顾客名下酒水，或进行扫码操作。',
+                or_divider: '或快速扫描二维码',
+                btn_scan_qr: '开启摄像头扫码',
+                no_search_yet: '请输入手机号或扫描二维码以调出在库存酒记录。',
+                withdraw_header: '取酒与消耗核销',
+                withdraw_desc: '员工输入授权密码即可协助顾客取走整瓶或扣减开瓶余量。',
+                lbl_withdraw_outlet: '当前取酒分店 *',
+                lbl_withdraw_search: '顾客手机号或扫码查存酒 *',
+                btn_withdraw_find: '搜索',
+                btn_withdraw_scan_icon: '扫码',
+                lbl_select_bottle: '勾选需取出的具体酒水及数量 *',
+                auth_title_sub: 'KTV 寄存酒管理系统 • BOTTLE KEEPER',
+                auth_tab_login: '登录 ID',
+                auth_tab_register: '注册新 ID',
+                lbl_auth_name: '真实姓名 *',
+                lbl_auth_phone: '手机号码 ID *',
+                lbl_auth_pin: '登录密码 (PIN) *',
+                btn_login_now: '立即登录',
+                btn_reg_now: '注册并登录',
+                btn_guest_access: '以访客/店员速查身份直接体验 →',
                 nav_deposit: "存酒",
                 nav_lookup: "查酒",
                 nav_withdraw: "取酒",
                 nav_history: "记录",
                 nav_admin: "管理",
+                hist_header: "操作记录",
+                hist_desc: "实时追踪存酒与取酒记录。",
+                btn_export: "导出日志",
+                lbl_filter_outlet: "分店筛选",
+                lbl_filter_expiry: "查看过期月份",
+                lbl_staff_pin: "店员密码 *",
+                btn_confirm_withdraw: "验证密码并扣减所选酒水",
+                sec_note_title: "安全审计提示",
+                sec_note_desc: "所有取酒操作都需要店员密码，记录将永久保留供管理员审计。",
                 modal_title: "RED BOX 存酒凭证",
-                modal_subtitle: "请将此二维码出示给服务员以便快捷取酒。",
+                modal_subtitle: "请向店员出示此二维码快速核销。",
                 btn_share: "分享",
-                btn_done: "完成"
+                btn_done: "完成",
+                btn_print: "打印",
+                adm_lock_title: "管理员权限验证",
+                adm_lock_desc: "员工仅支持存/查/取/记录功能。进入后台管理需输入管理员密码。",
+                adm_unlock: "解锁管理后台",
+                adm_logged_in: "已登录管理员模式",
+                adm_exit: "退出管理模式",
+                adm_pw_title: "修改管理员密码",
+                adm_pw_desc: "修改管理员主密码。",
+                adm_old_pin: "旧管理员密码 *",
+                adm_new_pin: "新管理员密码 *",
+                adm_save_pin: "保存新管理员密码",
+                admin_header: "员工权限与密码管理",
+                admin_desc: "授权员工并管理取酒所需的安全密码。",
+                lbl_staff_name: "员工姓名 *",
+                lbl_staff_code: "4位密码 *",
+                lbl_staff_role: "职位权限",
+                btn_add_staff: "添加授权员工",
+                lbl_active_staff: "已授权员工及密码重置",
+                liquor_mgr_header: "酒品名称管理",
+                liquor_mgr_desc: "添加或移除存酒时可选的酒品。",
+                lbl_liquor_name: "酒品名称 *",
+                btn_add_liquor: "添加酒名称",
+                lbl_active_liquors: "已有酒品列表",
+                outlet_header: "分店门店管理",
+                outlet_desc: "添加并管理 KTV 分店。",
+                lbl_outlet_name: "分店名称 *",
+                lbl_outlet_code: "简写代码 *",
+                btn_add_outlet: "添加分店",
+                lbl_active_outlets: "已注册分店",
+                stats_title: "分店库存统计",
+                stats_desc: "各分店的存酒单与库存概览。"
+            },
+            en: {
+                lang_label: '中文',
+                app_subtitle: 'S I N C E 2 0 0 0 • Liquor Keeper',
+                dep_header: 'New Bottle Deposit',
+                dep_desc: 'Record customer liquor securely with instant QR voucher generation.',
+                lbl_cust_name: 'Customer Name *',
+                lbl_phone: 'Phone Number *',
+                lbl_liquor_items: 'Liquor Brand & Qty (1-100 or 1%-100%) *',
+                btn_add_another: 'Add Another Liquor',
+                lbl_room: 'Room No',
+                lbl_outlet: 'Outlet *',
+                lbl_expiry: 'Expiration',
+                lbl_photo: 'Bottle Label Photo',
+                photo_label: 'Tap to capture label',
+                btn_gen_deposit: 'Confirm Deposit & Generate QR',
+                lookup_header: 'Lookup & Scan Vault',
+                lookup_desc: 'Search customer inventory by phone or scan QR code.',
+                or_divider: 'OR QUICK SCAN',
+                btn_scan_qr: 'Open Camera Scanner',
+                no_search_yet: 'Enter phone number or scan QR to check active bottles.',
+                withdraw_header: 'Bottle Withdrawal',
+                withdraw_desc: 'Deduct opened or finished bottles with authorized staff PIN.',
+                lbl_withdraw_outlet: 'Redemption Outlet *',
+                lbl_withdraw_search: 'Customer Phone or QR Scan *',
+                btn_withdraw_find: 'Find',
+                btn_withdraw_scan_icon: 'Scan',
+                lbl_select_bottle: 'Select Liquor to Withdraw *',
+                auth_title_sub: 'KTV Liquor Keeper System',
+                auth_tab_login: 'Sign In',
+                auth_tab_register: 'Register ID',
+                lbl_auth_name: 'Full Name *',
+                lbl_auth_phone: 'Phone Number ID *',
+                lbl_auth_pin: 'Password / PIN *',
+                btn_login_now: 'Sign In Now',
+                btn_reg_now: 'Register & Sign In',
+                btn_guest_access: 'Continue as Guest / Fast Check →',
+                nav_deposit: "Deposit",
+                nav_lookup: "Lookup",
+                nav_withdraw: "Withdraw",
+                nav_history: "Logs",
+                nav_admin: "Admin",
+                hist_header: "Activity & Audit Log",
+                hist_desc: "Real-time tracking of deposits and redemptions.",
+                btn_export: "Export Log",
+                lbl_filter_outlet: "Filter Outlet",
+                lbl_filter_expiry: "Filter Expiry Month",
+                lbl_staff_pin: "Staff PIN *",
+                btn_confirm_withdraw: "Verify PIN & Deduct Selected",
+                sec_note_title: "Security Audit Notice",
+                sec_note_desc: "All withdrawals require a staff PIN. Logs are kept permanently for manager auditing.",
+                modal_title: "RED BOX Deposit Voucher",
+                modal_subtitle: "Show this QR code to staff for fast check-in.",
+                btn_share: "Share",
+                btn_done: "Done",
+                btn_print: "Print",
+                adm_lock_title: "Admin Verification",
+                adm_lock_desc: "Staff can only deposit, look up, withdraw and view logs. Enter the admin password to open the back office.",
+                adm_unlock: "Unlock Admin Panel",
+                adm_logged_in: "Admin mode active",
+                adm_exit: "Exit Admin Mode",
+                adm_pw_title: "Change Admin Password",
+                adm_pw_desc: "Change the master administrator PIN.",
+                adm_old_pin: "Current PIN *",
+                adm_new_pin: "New PIN *",
+                adm_save_pin: "Update Admin PIN",
+                admin_header: "Staff Authorization & PINs",
+                admin_desc: "Authorize staff and manage their withdrawal PINs.",
+                lbl_staff_name: "Staff Name *",
+                lbl_staff_code: "4-Digit PIN *",
+                lbl_staff_role: "Role",
+                btn_add_staff: "Add Authorized Staff",
+                lbl_active_staff: "Authorized Staff (Reset PIN)",
+                liquor_mgr_header: "Liquor Brands",
+                liquor_mgr_desc: "Add or remove brands available for deposit.",
+                lbl_liquor_name: "Liquor Name *",
+                btn_add_liquor: "Add Liquor Brand",
+                lbl_active_liquors: "Active Liquor List",
+                outlet_header: "Outlet Management",
+                outlet_desc: "Add and manage KTV branches.",
+                lbl_outlet_name: "Store Name *",
+                lbl_outlet_code: "Store Code *",
+                btn_add_outlet: "Add New Outlet",
+                lbl_active_outlets: "Active Outlets",
+                stats_title: "Outlet Statistics",
+                stats_desc: "Overview of vouchers and stock per outlet."
             }
         };
 
-        let currentLang = 'zh';
-        let capturedPhotoData = null;
-        let currentGeneratedId = '';
-        let activeScannerContext = null;
-        let html5QrCode = null;
+        // ===== Helpers =====
+        const STORAGE_KEY = 'redbox_bottle_keeper_v1';
+        const PIN_SALT = 'redbox-salt:';
 
-        let liquorBrands = [
-            "Chivas Regal 12 Years (芝华士12年)",
-            "Martell VSOP (马爹利VSOP)",
-            "Martell Cordon Bleu (马爹利蓝带)",
-            "Macallan 12 Years (麦卡伦12年)",
-            "Hennessy VSOP (轩尼诗VSOP)",
-            "Johnnie Walker Black (黑牌威士忌)",
-            "Royal Salute 21 Years (皇家礼炮21年)"
-        ];
-
-        let bottleVault = [
-            { id: "RB-8820", name: "Kelvin Wong", phone: "0123456789", bottle: "Chivas Regal 12 Years (芝华士12年) x2", qty: 2, qtyType: "bottle", room: "VIP 03", expiry: "2026-12-31", date: "2026-10-20", status: "Active", photo: null, outlet: "RED BOX Pavilion KL" },
-            { id: "RB-8819", name: "Jessica Lee", phone: "0198765432", bottle: "Martell VSOP (马爹利VSOP) 80%", qty: 80, qtyType: "percent", room: "VIP 12", expiry: "2026-11-15", date: "2026-10-18", status: "Active", photo: null, outlet: "RED BOX The Gardens" },
-            { id: "RB-8818", name: "David Tan", phone: "0112233445", bottle: "Macallan 12 Years (麦卡伦12年) x1", qty: 1, qtyType: "bottle", room: "VIP 08", expiry: "2026-11-30", date: "2026-10-15", status: "Active", photo: null, outlet: "RED BOX Pavilion KL" }
-        ];
-
-        let staffList = [
-            { id: 'S-01', name: 'Admin Boss', pin: '1234', role: 'Store Manager / 店长' },
-            { id: 'S-02', name: 'Ah Seng (Captain)', pin: '8888', role: 'Captain / Supervisor / 领班' },
-            { id: 'S-03', name: 'Xiao Mei', pin: '6666', role: 'Floor Staff / 服务员' }
-        ];
-
-        let outletList = [
-            { id: 'O-01', name: 'RED BOX Pavilion KL', code: 'KL-PV' },
-            { id: 'O-02', name: 'RED BOX The Gardens', code: 'KL-GD' },
-            { id: 'O-03', name: 'GREEN BOX Mid Valley', code: 'MV-GB' }
-        ];
-
-        let historyLog = [
-            { id: "LOG-01", time: "2026-10-20 22:15", type: "DEPOSIT", desc: "Kelvin Wong deposited 2x Chivas Regal 12 (VIP 03) at RED BOX Pavilion KL" },
-            { id: "LOG-02", time: "2026-10-18 23:40", type: "DEPOSIT", desc: "Jessica Lee deposited 80% Martell VSOP (VIP 12) at RED BOX The Gardens" },
-            { id: "LOG-03", time: "2026-10-15 21:10", type: "DEPOSIT", desc: "David Tan deposited 1x Macallan 12 (VIP 08) at RED BOX Pavilion KL" }
-        ];
-
-        window.addEventListener('DOMContentLoaded', function() {
-            const expiryInput = document.getElementById('dep-expiry');
-            if (expiryInput) {
-                const threeMonthsLater = new Date();
-                threeMonthsLater.setMonth(threeMonthsLater.getMonth() + 3);
-                expiryInput.value = threeMonthsLater.toISOString().split('T')[0];
+        function sha256(ascii) {
+            function rr(v, a) { return (v >>> a) | (v << (32 - a)); }
+            var mp = Math.pow, mw = mp(2, 32), i, j, result = '', words = [], asciiBitLength = ascii.length * 8;
+            var hash = sha256.h = sha256.h || [], k = sha256.k = sha256.k || [], pc = k.length, ic = {};
+            for (var c = 2; pc < 64; c++) {
+                if (!ic[c]) {
+                    for (i = 0; i < 313; i += c) ic[i] = c;
+                    hash[pc] = (mp(c, .5) * mw) | 0;
+                    k[pc++] = (mp(c, 1 / 3) * mw) | 0;
+                }
             }
-            initDepositRows();
-            updateOutletDropdowns();
-            updateWithdrawDropdown();
-            renderHistory();
-            renderStaffList();
-            renderOutletList();
-            renderLiquorList();
-            applyLanguage();
-        });
+            ascii += '\x80';
+            while (ascii.length % 64 - 56) ascii += '\x00';
+            for (i = 0; i < ascii.length; i++) {
+                j = ascii.charCodeAt(i);
+                if (j >> 8) return;
+                words[i >> 2] |= j << ((3 - i) % 4) * 8;
+            }
+            words[words.length] = ((asciiBitLength / mw) | 0);
+            words[words.length] = (asciiBitLength);
+            for (j = 0; j < words.length;) {
+                var w = words.slice(j, j += 16), oldHash = hash;
+                hash = hash.slice(0, 8);
+                for (i = 0; i < 64; i++) {
+                    var w15 = w[i - 15], w2 = w[i - 2];
+                    var a = hash[0], e = hash[4];
+                    var temp1 = hash[7] + (rr(e, 6) ^ rr(e, 11) ^ rr(e, 25)) + ((e & hash[5]) ^ ((~e) & hash[6])) + k[i]
+                        + (w[i] = (i < 16) ? w[i] : (w[i - 16] + (rr(w15, 7) ^ rr(w15, 18) ^ (w15 >>> 3)) + w[i - 7] + (rr(w2, 17) ^ rr(w2, 19) ^ (w2 >>> 10))) | 0);
+                    var temp2 = (rr(a, 2) ^ rr(a, 13) ^ rr(a, 22)) + ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
+                    hash = [(temp1 + temp2) | 0].concat(hash);
+                    hash[4] = (hash[4] + temp1) | 0;
+                }
+                for (i = 0; i < 8; i++) hash[i] = (hash[i] + oldHash[i]) | 0;
+            }
+            for (i = 0; i < 8; i++) {
+                for (j = 3; j + 1; j--) {
+                    var b = (hash[i] >> (j * 8)) & 255;
+                    result += ((b < 16) ? 0 : '') + b.toString(16);
+                }
+            }
+            return result;
+        }
+
+        function hashPin(pin) {
+            return sha256(unescape(encodeURIComponent(PIN_SALT + String(pin))));
+        }
+
+        function esc(str) {
+            return String(str == null ? '' : str).replace(/[&<>"']/g, function(c) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+            });
+        }
+
+        function t2(zh, en) { return currentLang === 'zh' ? zh : en; }
+
+        function saveState() {
+            const data = { bottleVault, historyLog, liquorBrands, outletList, staffList, adminPinHash };
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            } catch (e) {
+                // Most likely out of space (photos). Retry without photos.
+                try {
+                    const slim = Object.assign({}, data, { bottleVault: bottleVault.map(v => Object.assign({}, v, { photo: null })) });
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(slim));
+                } catch (e2) { /* storage unavailable */ }
+            }
+        }
+
+        function loadState() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return;
+                const st = JSON.parse(raw);
+                if (Array.isArray(st.bottleVault)) bottleVault = st.bottleVault;
+                if (Array.isArray(st.historyLog)) historyLog = st.historyLog;
+                if (Array.isArray(st.liquorBrands) && st.liquorBrands.length) liquorBrands = st.liquorBrands;
+                if (Array.isArray(st.outletList) && st.outletList.length) outletList = st.outletList;
+                if (Array.isArray(st.staffList) && st.staffList.length) staffList = st.staffList;
+                if (typeof st.adminPinHash === 'string') adminPinHash = st.adminPinHash;
+            } catch (e) { /* ignore corrupted storage */ }
+        }
+
+        function daysUntil(dateStr) {
+            if (!dateStr) return null;
+            const d = new Date(dateStr + 'T00:00:00');
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return Math.round((d - today) / 86400000);
+        }
+
+        function renderExpiryAlert() {
+            const box = document.getElementById('expiry-alert');
+            if (!box) return;
+            const list = bottleVault
+                .filter(b => b.status === 'Active' && b.expiry)
+                .map(b => ({ b, days: daysUntil(b.expiry) }))
+                .filter(x => x.days !== null && x.days <= 7)
+                .sort((a, b) => a.days - b.days);
+            if (!list.length) { box.classList.add('hidden'); box.innerHTML = ''; return; }
+            box.classList.remove('hidden');
+            const rows = list.slice(0, 5).map(({ b, days }) => {
+                const label = days < 0 ? t2(`已过期 ${-days} 天`, `Expired ${-days}d ago`)
+                    : (days === 0 ? t2('今天到期', 'Expires today') : t2(`${days} 天后到期`, `Expires in ${days}d`));
+                const color = days < 0 ? 'text-red-400' : 'text-amber-300';
+                return `<div class="flex justify-between text-[11px] py-1 border-t border-amber-900/30"><span class="text-gray-200">${esc(b.id)} · ${esc(b.name)} (${esc(b.outlet || '')})</span><span class="${color} font-mono">${label}</span></div>`;
+            }).join('');
+            const more = list.length > 5 ? `<div class="text-[10px] text-gray-400 pt-1">${t2(`另有 ${list.length - 5} 笔…`, `+${list.length - 5} more…`)}</div>` : '';
+            box.innerHTML = `<div class="bg-amber-950/30 border border-amber-800/50 rounded-2xl p-3 text-xs"><div class="font-bold text-amber-300 flex items-center space-x-1.5 mb-1"><i class="fa-solid fa-bell"></i><span>${t2('存酒到期提醒（7天内）', 'Expiry reminders (within 7 days)')}</span></div>${rows}${more}</div>`;
+        }
+
+        function renderOutletStats() {
+            const c = document.getElementById('outlet-stats');
+            if (!c) return;
+            c.innerHTML = outletList.map(o => {
+                const all = bottleVault.filter(b => b.outlet === o.name);
+                const active = all.filter(b => b.status === 'Active');
+                const bottles = active.reduce((sum, v) => sum + (v.items || []).filter(i => i.qtyType === 'bottle').reduce((a, i) => a + i.qty, 0), 0);
+                const opened = active.reduce((sum, v) => sum + (v.items || []).filter(i => i.qtyType === 'percent' && i.qty > 0).length, 0);
+                const soon = active.filter(v => { const d = daysUntil(v.expiry); return d !== null && d <= 7; }).length;
+                const cell = (n, label) => `<div><span class="block text-white text-sm font-bold">${n}</span>${label}</div>`;
+                return `<div class="bg-redbox-dark p-2.5 rounded-xl border border-redbox-border text-xs">
+                    <div class="flex justify-between"><strong class="text-white">${esc(o.name)}</strong><span class="text-[10px] text-gray-400 font-mono">${esc(o.code)}</span></div>
+                    <div class="grid grid-cols-5 gap-1 pt-2 text-center text-[10px] text-gray-400">
+                        ${cell(all.length, t2('总存单', 'Total'))}${cell(active.length, t2('在库单', 'Active'))}${cell(bottles, t2('整瓶', 'Bottles'))}${cell(opened, t2('开瓶', 'Opened'))}${cell(soon, t2('将到期', 'Expiring'))}
+                    </div></div>`;
+            }).join('');
+        }
+
+        function updateExpiryMonthOptions() {
+            const sel = document.getElementById('expiry-month-filter');
+            if (!sel) return;
+            const cur = sel.value;
+            const months = [...new Set(bottleVault.map(b => b.expiry && b.expiry.slice(0, 7)).filter(Boolean))].sort();
+            sel.innerHTML = `<option value="ALL">${t2('所有月份', 'All Months')}</option>` +
+                months.map(m => `<option value="${m}">${m.slice(5)}/${m.slice(0, 4)}</option>`).join('');
+            sel.value = months.includes(cur) ? cur : 'ALL';
+        }
+
+        function setAuthMode(mode) {
+            currentAuthMode = mode;
+            const btnLogin = document.getElementById('btn-auth-mode-login');
+            const btnRegister = document.getElementById('btn-auth-mode-register');
+            const fieldName = document.getElementById('auth-field-name');
+            const submitText = document.getElementById('auth-submit-text');
+
+            if (mode === 'login') {
+                btnLogin.className = "flex-1 py-2 rounded-lg bg-red-600 text-white transition shadow";
+                btnRegister.className = "flex-1 py-2 rounded-lg text-gray-400 hover:text-white transition";
+                fieldName.classList.add('hidden');
+                submitText.innerText = currentLang === 'zh' ? '立即登录' : 'Sign In Now';
+            } else {
+                btnRegister.className = "flex-1 py-2 rounded-lg bg-red-600 text-white transition shadow";
+                btnLogin.className = "flex-1 py-2 rounded-lg text-gray-400 hover:text-white transition";
+                fieldName.classList.remove('hidden');
+                submitText.innerText = currentLang === 'zh' ? '注册并登录' : 'Register & Sign In';
+            }
+        }
+
+        function openAuthScreen() {
+            const screen = document.getElementById('auth-screen');
+            if (screen) screen.classList.remove('hidden');
+        }
+
+        function closeAuthScreen() {
+            const screen = document.getElementById('auth-screen');
+            if (screen) screen.classList.add('hidden');
+        }
+
+        function handleAuthSubmit(e) {
+            e.preventDefault();
+            const phone = document.getElementById('auth-phone').value.trim();
+            const pass = document.getElementById('auth-pass').value.trim();
+            const name = document.getElementById('auth-name').value.trim();
+
+            if (!phone || !pass) {
+                showToast("Please enter phone number and password", "请填写手机号码和密码！");
+                return;
+            }
+
+            if (currentAuthMode === 'register' && !name) {
+                showToast("Please enter your name", "请输入您的姓名！");
+                return;
+            }
+
+            loggedUser = {
+                name: currentAuthMode === 'register' ? name : (name || 'Member (' + phone.slice(-4) + ')'),
+                phone: phone
+            };
+
+            const depName = document.getElementById('dep-name');
+            const depPhone = document.getElementById('dep-phone');
+            if (depName) depName.value = loggedUser.name;
+            if (depPhone) depPhone.value = loggedUser.phone;
+
+            const headerUser = document.getElementById('header-user-name');
+            if (headerUser) headerUser.innerText = loggedUser.name;
+
+            closeAuthScreen();
+            showToast(
+                currentAuthMode === 'register' ? "Account created and signed in!" : "Signed in successfully!",
+                currentAuthMode === 'register' ? "注册并登录成功！" : "登录成功！"
+            );
+        }
+
+        function guestLogin() {
+            loggedUser = {
+                name: 'Guest User',
+                phone: '0123456789'
+            };
+            const headerUser = document.getElementById('header-user-name');
+            if (headerUser) headerUser.innerText = loggedUser.name;
+            closeAuthScreen();
+            showToast("Logged in as Guest", "已以访客身份进入系统");
+        }
 
         function initDepositRows() {
             const container = document.getElementById('deposit-liquor-rows');
-            if (!container) return;
-            container.innerHTML = '';
-            addLiquorRow();
+            if (container && container.children.length === 0) {
+                addLiquorRow();
+            }
+        }
+
+        window.onload = function() {
+            loadState();
+            window.addEventListener('pagehide', saveState);
+            initDepositRows();
+            updateOutletDropdowns();
+            
+            const threeMonthsLater = new Date();
+            threeMonthsLater.setMonth(threeMonthsLater.getMonth() + 3);
+            const expiryEl = document.getElementById('dep-expiry');
+            if (expiryEl) expiryEl.value = threeMonthsLater.toISOString().split('T')[0];
+
+            applyLanguage();
+        };
+
+        function searchWithdrawBottles(targetId = null) {
+            const phoneInput = document.getElementById('withdraw-phone-input');
+            const phone = phoneInput ? phoneInput.value.trim() : '';
+            const listContainer = document.getElementById('withdraw-liquor-list-container');
+            const actionPanel = document.getElementById('withdraw-action-panel');
+            const promptBox = document.getElementById('withdraw-prompt');
+            const custNameEl = document.getElementById('withdraw-cust-name');
+
+            if (!listContainer || !actionPanel || !promptBox) return;
+
+            let matchedVaults = [];
+
+            if (targetId) {
+                matchedVaults = bottleVault.filter(b => b.id === targetId && b.status === 'Active');
+            } else if (phone) {
+                matchedVaults = bottleVault.filter(b => b.phone === phone && b.status === 'Active');
+            } else {
+                showToast("Please enter phone number or scan QR", "请输入手机号或进行扫码");
+                return;
+            }
+
+            if (matchedVaults.length === 0) {
+                actionPanel.classList.add('hidden');
+                promptBox.classList.remove('hidden');
+                showToast("No active bottles found", "未查找到有效在库存酒记录");
+                return;
+            }
+
+            let liquorItemsHtml = '';
+            let customerSummaryName = matchedVaults[0].name + ` (${matchedVaults[0].phone})`;
+
+            matchedVaults.forEach((vault, vaultIdx) => {
+                if (!vault.items) {
+                    vault.items = [{
+                        id: 'item-0',
+                        brand: vault.bottle,
+                        qty: vault.qty || 1,
+                        qtyType: vault.qtyType || 'bottle'
+                    }];
+                }
+
+                const activeItems = vault.items.filter(item => item.qty > 0);
+                if (activeItems.length === 0) return;
+
+                liquorItemsHtml += `
+                    <div class="bg-redbox-dark/90 p-3 rounded-xl border border-redbox-border space-y-2 mb-3">
+                        <div class="flex justify-between items-center pb-1.5 border-b border-redbox-border/60 text-xs">
+                            <div class="flex items-center space-x-2">
+                                <span class="bg-red-600/30 text-rose-400 font-mono px-2 py-0.5 rounded text-[11px] font-bold">${vault.id}</span>
+                                <span class="text-gray-300 font-medium">${esc(vault.room)}</span>
+                                <span class="text-[10px] text-gray-400">(${esc(vault.outlet || 'General')})</span>
+                            </div>
+                            <span class="text-[10px] text-amber-300 font-mono">${t2('过期','Exp')}: ${formatDateUK(vault.expiry) || t2('无','-')}</span>
+                        </div>
+                        <div class="space-y-2 pt-1">
+                `;
+
+                vault.items.forEach((item, itemIdx) => {
+                    if (item.qty <= 0) return;
+                    const isPercent = item.qtyType === 'percent';
+                    const maxQty = item.qty;
+                    const unitLabel = isPercent ? '%' : t2('瓶','btl');
+
+                    liquorItemsHtml += `
+                        <div class="bg-redbox-card p-2.5 rounded-lg border border-redbox-border/80 flex items-center justify-between space-x-2">
+                            <div class="flex items-center space-x-2.5 flex-1 min-w-0">
+                                <input type="checkbox" id="chk-withdraw-${vaultIdx}-${itemIdx}" data-vault-id="${vault.id}" data-item-index="${itemIdx}" class="w-4 h-4 rounded accent-red-600 bg-redbox-dark border-redbox-border cursor-pointer">
+                                <label for="chk-withdraw-${vaultIdx}-${itemIdx}" class="cursor-pointer text-xs text-white truncate font-medium">
+                                    ${esc(item.brand)}
+                                    <span class="block text-[10px] text-amber-400 font-mono">${t2('余量','Left')}: ${item.qty}${unitLabel}</span>
+                                </label>
+                            </div>
+                            <div class="flex items-center space-x-1.5 w-32 justify-end">
+                                <span class="text-[10px] text-gray-400">${t2('取出','Take')}:</span>
+                                <input type="number" id="qty-withdraw-${vaultIdx}-${itemIdx}" min="1" max="${maxQty}" value="${isPercent ? Math.min(10, maxQty) : 1}" class="w-16 bg-redbox-dark border border-redbox-border rounded-lg px-2 py-1 text-xs text-white text-center focus:outline-none focus:border-red-500">
+                                <span class="text-xs text-gray-300 font-mono">${unitLabel}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                liquorItemsHtml += `
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (!liquorItemsHtml) {
+                listContainer.innerHTML = `<div class="text-xs text-amber-400 p-2 text-center">${t2('该顾客的所有存酒均已取完。','All bottles for this customer have been withdrawn.')}</div>`;
+            } else {
+                listContainer.innerHTML = liquorItemsHtml;
+            }
+
+            if (custNameEl) custNameEl.innerText = t2(`${customerSummaryName} - 共查到 ${matchedVaults.length} 笔未销账户`, `${customerSummaryName} - ${matchedVaults.length} active voucher(s)`);
+            promptBox.classList.add('hidden');
+            actionPanel.classList.remove('hidden');
+
+            showToast(`Found ${matchedVaults.length} active vault(s)`, `成功调出 ${matchedVaults.length} 笔存酒单据`);
+        }
+
+        function handleWithdraw() {
+            const outletSelect = document.getElementById('withdraw-outlet');
+            const pinInput = document.getElementById('withdraw-staff-pin');
+            const actionPanel = document.getElementById('withdraw-action-panel');
+
+            if (!actionPanel || actionPanel.classList.contains('hidden')) {
+                showToast("Please search phone or scan QR first!", "请先在上方输入手机号点击搜索，或使用扫码！");
+                return;
+            }
+
+            if (!pinInput || !pinInput.value.trim()) {
+                showToast("Please enter Staff PIN", "请填写店员密码！");
+                pinInput.focus();
+                return;
+            }
+
+            const withdrawOutlet = outletSelect ? outletSelect.value : 'Main';
+            const staffPin = pinInput.value.trim();
+
+            const staff = staffList.find(s => s.pinHash === hashPin(staffPin));
+            if (!staff) {
+                showToast("Invalid Staff PIN code!", "店员PIN密码错误或未授权！");
+                return;
+            }
+
+            const listContainer = document.getElementById('withdraw-liquor-list-container');
+            const checkboxes = listContainer.querySelectorAll('input[type="checkbox"]:checked');
+
+            if (checkboxes.length === 0) {
+                showToast("Please check at least one liquor to withdraw", "请勾选至少一种要取出的酒水！");
+                return;
+            }
+
+            let withdrawLogs = [];
+            let updatedVaults = [];
+
+            checkboxes.forEach(chk => {
+                const vaultId = chk.getAttribute('data-vault-id');
+                const itemIdx = parseInt(chk.getAttribute('data-item-index'));
+                const vault = bottleVault.find(b => b.id === vaultId);
+
+                if (!vault || !vault.items[itemIdx]) return;
+
+                const item = vault.items[itemIdx];
+                const qtyInput = chk.closest('.bg-redbox-card').querySelector('input[type="number"]');
+                const withdrawVal = parseInt(qtyInput ? qtyInput.value : '0') || 0;
+
+                if (withdrawVal <= 0 || withdrawVal > item.qty) {
+                    return;
+                }
+
+                item.qty -= withdrawVal;
+                const unitLabel = item.qtyType === 'percent' ? '%' : '整瓶';
+                withdrawLogs.push(`[${vault.id}] ${esc(item.brand)} x ${withdrawVal}${unitLabel}`);
+
+                const totalRemaining = vault.items.reduce((sum, itm) => sum + itm.qty, 0);
+                if (totalRemaining <= 0) {
+                    vault.status = 'Redeemed';
+                }
+
+                const updatedBottleStr = vault.items
+                    .filter(i => i.qty > 0)
+                    .map(i => `${i.brand} (${i.qtyType === 'percent' ? i.qty + '%' : 'x' + i.qty})`)
+                    .join(', ');
+
+                vault.bottle = updatedBottleStr || '已取完';
+                vault.bottleFormatted = `<div class="mt-1 font-mono text-[11px] bg-redbox-dark/60 p-2 rounded-lg border border-redbox-border/50 text-gray-200">` +
+                    vault.items.filter(i => i.qty > 0).map((i, idx) => `${idx + 1}. ${esc(i.brand)} x ${i.qty}${i.qtyType === 'percent' ? '%' : ' btl'}`).join('<br>') +
+                    `</div>`;
+
+                if (!updatedVaults.some(v => v.id === vault.id)) {
+                    updatedVaults.push(vault);
+                }
+            });
+
+            if (withdrawLogs.length === 0) {
+                showToast("Invalid quantity for selection", "所选酒水数量输入有误或超出当前余量！");
+                return;
+            }
+
+            const withdrawItemsFormatted = withdrawLogs.map((logStr, i) => `${i + 1}. ${logStr}`).join('<br>');
+            const formattedLogDesc = `<div class="mt-1 font-mono text-[11px] bg-redbox-dark/60 p-2 rounded-lg border border-redbox-border/50 text-gray-200">${withdrawItemsFormatted}</div>`;
+
+            historyLog.unshift({
+                id: 'LOG-' + Date.now() + '-' + Math.floor(Math.random()*999),
+                time: formatDateTimeUK(new Date()),
+                type: 'WITHDRAW',
+                outlet: withdrawOutlet,
+                vaultIds: updatedVaults.map(v => v.id),
+                desc: `${esc(staff.name)} 在 [${esc(withdrawOutlet)}] 验证PIN完成取酒扣减:${formattedLogDesc}`
+            });
+
+            pinInput.value = '';
+            renderHistory();
+            searchWithdrawBottles();
+
+            const activeVaultWithRemaining = updatedVaults.find(v => v.status === 'Active' && v.items.some(i => i.qty > 0));
+
+            if (activeVaultWithRemaining) {
+                const remainingSummary = activeVaultWithRemaining.items
+                    .filter(i => i.qty > 0)
+                    .map(i => `${i.brand} (${i.qtyType === 'percent' ? i.qty + '%' : 'x' + i.qty})`)
+                    .join(', ');
+
+                currentGeneratedId = activeVaultWithRemaining.id;
+                document.getElementById('rec-id').innerText = activeVaultWithRemaining.id;
+                document.getElementById('rec-name').innerText = activeVaultWithRemaining.name;
+                document.getElementById('rec-bottle').innerText = remainingSummary;
+                document.getElementById('rec-expiry').innerText = formatDateUK(activeVaultWithRemaining.expiry);
+
+                const qrContainer = document.getElementById('qrcode');
+                qrContainer.innerHTML = '';
+                if (typeof QRCode !== 'undefined') {
+                    new QRCode(qrContainer, {
+                        text: activeVaultWithRemaining.id,
+                        width: 140,
+                        height: 140,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                } else {
+                    qrContainer.innerText = activeVaultWithRemaining.id;
+                }
+
+                const thumb = document.getElementById('modal-bottle-thumb');
+                if (activeVaultWithRemaining.photo && thumb) {
+                    thumb.src = activeVaultWithRemaining.photo;
+                    thumb.classList.remove('hidden');
+                } else if (thumb) {
+                    thumb.classList.add('hidden');
+                }
+
+                document.getElementById('receipt-modal').classList.remove('hidden');
+                showToast("Withdrawal complete! New QR generated for remaining liquor.", "取酒成功！已为您生成剩余酒水的新QR凭证！");
+            } else {
+                showToast("Withdrawal complete! All bottles redeemed.", "取酒成功！名下酒水已全部取完。");
+            }
         }
 
         function addLiquorRow() {
@@ -711,7 +1458,7 @@
             if (!container) return;
             const rowId = 'liq-row-' + Date.now() + Math.floor(Math.random() * 1000);
             
-            const optionsHtml = liquorBrands.map(b => `<option value="${b}">${b}</option>`).join('');
+            const optionsHtml = liquorBrands.map(b => `<option value="${esc(b)}">${esc(b)}</option>`).join('');
 
             const rowDiv = document.createElement('div');
             rowDiv.id = rowId;
@@ -751,6 +1498,18 @@
             if (row) row.remove();
         }
 
+        function refreshDepositLiquorDropdowns() {
+            const selects = document.querySelectorAll('.dep-item-brand');
+            const optionsHtml = liquorBrands.map(b => `<option value="${esc(b)}">${esc(b)}</option>`).join('');
+            selects.forEach(select => {
+                const currentVal = select.value;
+                select.innerHTML = optionsHtml;
+                if (liquorBrands.includes(currentVal)) {
+                    select.value = currentVal;
+                }
+            });
+        }
+
         function applyLanguage() {
             const dict = i18n[currentLang];
             const langBtn = document.getElementById('lang-btn-text');
@@ -766,10 +1525,15 @@
         function toggleLanguage() {
             currentLang = currentLang === 'zh' ? 'en' : 'zh';
             applyLanguage();
+            renderExpiryAlert();
+            renderHistory();
+            if (isAdminAuthenticated) checkAdminStateUI();
             showToast(currentLang === 'en' ? "Switched to English" : "已切换为中文", currentLang === 'en' ? "Switched to English" : "已切换为中文");
         }
 
         function showToast(enText, zhText) {
+            saveState();
+            renderExpiryAlert();
             const toast = document.getElementById('toast');
             const msgEl = document.getElementById('toast-msg');
             if (!toast || !msgEl) return;
@@ -795,13 +1559,92 @@
             if(tabName === 'deposit') updateOutletDropdowns();
             if(tabName === 'withdraw') {
                 updateOutletDropdowns();
-                updateWithdrawDropdown();
             }
             if(tabName === 'history') renderHistory();
             if(tabName === 'admin') {
+                checkAdminStateUI();
+            }
+        }
+
+        function verifyAdminAccess(e) {
+            e.preventDefault();
+            const input = document.getElementById('admin-passcode-input');
+            const pin = input ? input.value.trim() : '';
+
+            const isSupervisor = staffList.some(s => s.pinHash === hashPin(pin) && s.role.toLowerCase().includes('supervisor'));
+
+            if (hashPin(pin) === adminPinHash || isSupervisor) {
+                isAdminAuthenticated = true;
+                if (input) input.value = '';
+                checkAdminStateUI();
+                const badge = document.getElementById('header-role-badge');
+                if (badge) {
+                    badge.innerText = 'Admin';
+                    badge.className = 'bg-amber-500/30 text-amber-300 text-[10px] px-1.5 py-0.2 rounded border border-amber-500/30 ml-1';
+                }
+                showToast("Admin access granted", "管理员权限解锁成功！");
+            } else {
+                showToast("Invalid Admin PIN", "密码错误！请重新输入");
+            }
+        }
+
+        function handleChangeAdminPin(e) {
+            e.preventDefault();
+            const oldPinInput = document.getElementById('admin-old-pin');
+            const newPinInput = document.getElementById('admin-new-pin');
+
+            const oldPin = oldPinInput ? oldPinInput.value.trim() : '';
+            const newPin = newPinInput ? newPinInput.value.trim() : '';
+
+            if (hashPin(oldPin) !== adminPinHash) {
+                showToast("Current admin PIN is incorrect!", "旧管理员密码输入错误！");
+                return;
+            }
+
+            if (!newPin || newPin.length < 4) {
+                showToast("New PIN must be at least 4 characters!", "新密码必须至少为4位字符！");
+                return;
+            }
+
+            adminPinHash = hashPin(newPin);
+            oldPinInput.value = '';
+            newPinInput.value = '';
+
+            historyLog.unshift({
+                id: 'LOG-' + Date.now() + '-' + Math.floor(Math.random()*999),
+                time: formatDateTimeUK(new Date()),
+                type: 'ADMIN',
+                desc: `Administrator changed the Master Access PIN.`
+            });
+
+            showToast("Admin PIN updated successfully!", "管理员密码修改成功！请牢记新密码");
+        }
+
+        function lockAdminAccess() {
+            isAdminAuthenticated = false;
+            checkAdminStateUI();
+            const badge = document.getElementById('header-role-badge');
+            if (badge) {
+                badge.innerText = 'Staff';
+                badge.className = 'bg-red-600/30 text-rose-300 text-[10px] px-1.5 py-0.2 rounded border border-red-500/30 ml-1';
+            }
+            showToast("Admin locked", "已退出管理员模式");
+        }
+
+        function checkAdminStateUI() {
+            const authPanel = document.getElementById('admin-auth-panel');
+            const contentPanel = document.getElementById('admin-content-panel');
+
+            if (isAdminAuthenticated) {
+                if (authPanel) authPanel.classList.add('hidden');
+                if (contentPanel) contentPanel.classList.remove('hidden');
                 renderStaffList();
                 renderOutletList();
                 renderLiquorList();
+                renderOutletStats();
+            } else {
+                if (authPanel) authPanel.classList.remove('hidden');
+                if (contentPanel) contentPanel.classList.add('hidden');
             }
         }
 
@@ -810,24 +1653,32 @@
             const withdrawSelect = document.getElementById('withdraw-outlet');
             const historyFilter = document.getElementById('history-outlet-filter');
 
-            const optionsHtml = outletList.map(o => `<option value="${o.name}">${o.name}</option>`).join('');
+            const optionsHtml = outletList.map(o => `<option value="${esc(o.name)}">${esc(o.name)}</option>`).join('');
             
             if(depSelect) depSelect.innerHTML = optionsHtml;
             if(withdrawSelect) withdrawSelect.innerHTML = optionsHtml;
             
             if(historyFilter) {
                 const currentVal = historyFilter.value;
-                historyFilter.innerHTML = `<option value="ALL">All Outlets / 所有分店</option>` + outletList.map(o => `<option value="${o.name}">${o.name}</option>`).join('');
+                historyFilter.innerHTML = `<option value="ALL">All Outlets / 所有分店</option>` + outletList.map(o => `<option value="${esc(o.name)}">${esc(o.name)}</option>`).join('');
                 historyFilter.value = currentVal;
             }
         }
 
         function handlePhotoCapture(e) {
             const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    capturedPhotoData = event.target.result;
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const maxSide = 800;
+                    const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+                    const canvas = document.createElement('canvas');
+                    canvas.width = Math.round(img.width * scale);
+                    canvas.height = Math.round(img.height * scale);
+                    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                    capturedPhotoData = canvas.toDataURL('image/jpeg', 0.6);
                     const preview = document.getElementById('photo-preview-img');
                     const placeholder = document.getElementById('photo-placeholder-content');
                     if (preview && placeholder) {
@@ -836,8 +1687,9 @@
                         placeholder.classList.add('hidden');
                     }
                 };
-                reader.readAsDataURL(file);
-            }
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
         }
 
         function handleDeposit(e) {
@@ -855,34 +1707,44 @@
             }
 
             let liquorSummaryList = [];
-            let firstQty = 1;
-            let firstQtyType = 'bottle';
+            let liquorBulletList = [];
+            let itemsArray = [];
             
             rowElements.forEach((row, idx) => {
                 const brand = row.querySelector('.dep-item-brand').value;
-                const qty = parseInt(row.querySelector('.dep-item-qty').value) || 1;
+                const qty = Math.min(100, Math.max(1, parseInt(row.querySelector('.dep-item-qty').value) || 1));
                 const qtyType = row.querySelector('.dep-item-type').value;
-                
-                if (idx === 0) {
-                    firstQty = qty;
-                    firstQtyType = qtyType;
-                }
 
-                const qtyLabel = qtyType === 'percent' ? `${qty}%` : `x${qty}`;
+                itemsArray.push({
+                    id: 'item-' + idx + '-' + Date.now(),
+                    brand,
+                    qty,
+                    qtyType
+                });
+
+                const qtyLabel = qtyType === 'percent' ? `${qty}%` : `${qty} btl`;
                 liquorSummaryList.push(`${brand} (${qtyLabel})`);
+                liquorBulletList.push(`${idx + 1}. ${esc(brand)} x ${qtyLabel}`);
             });
 
             const combinedBottleStr = liquorSummaryList.join(', ');
-            const newId = 'RB-' + Math.floor(1000 + Math.random() * 9000);
+            const formattedLiquorLog = rowElements.length > 1 
+                ? `<div class="mt-1 font-mono text-[11px] bg-redbox-dark/60 p-2 rounded-lg border border-redbox-border/50 text-gray-200">${liquorBulletList.join('<br>')}</div>`
+                : esc(liquorSummaryList[0]);
+
+            let newId;
+            do { newId = 'RB-' + Math.floor(1000 + Math.random() * 9000); } while (bottleVault.some(b => b.id === newId));
             currentGeneratedId = newId;
 
             const newBottle = {
                 id: newId,
                 name,
                 phone,
+                items: itemsArray,
                 bottle: combinedBottleStr,
-                qty: firstQty,
-                qtyType: firstQtyType,
+                bottleFormatted: formattedLiquorLog,
+                qty: itemsArray.length,
+                qtyType: 'bottle',
                 room,
                 outlet,
                 expiry,
@@ -893,11 +1755,17 @@
 
             bottleVault.unshift(newBottle);
 
+            const descText = rowElements.length > 1
+                ? `${esc(name)} deposited at ${esc(outlet)} (${esc(room)}):${formattedLiquorLog}`
+                : `${esc(name)} deposited ${esc(combinedBottleStr)} (${esc(room)}) at ${esc(outlet)}`;
+
             historyLog.unshift({
-                id: 'LOG-' + Math.floor(Math.random()*999),
-                time: new Date().toLocaleString(),
+                id: 'LOG-' + Date.now() + '-' + Math.floor(Math.random()*999),
+                time: formatDateTimeUK(new Date()),
                 type: 'DEPOSIT',
-                desc: `${name} deposited ${combinedBottleStr} (${room}) at ${outlet}`
+                outlet,
+                vaultIds: [newId],
+                desc: descText
             });
 
             document.getElementById('rec-id').innerText = newId;
@@ -929,10 +1797,11 @@
             }
 
             document.getElementById('receipt-modal').classList.remove('hidden');
-            updateWithdrawDropdown();
             renderHistory();
             
             document.getElementById('deposit-form').reset();
+            document.getElementById('dep-name').value = loggedUser.name;
+            document.getElementById('dep-phone').value = loggedUser.phone;
             initDepositRows();
             capturedPhotoData = null;
             const previewImg = document.getElementById('photo-preview-img');
@@ -989,6 +1858,17 @@
             return dateStr;
         }
 
+        function formatDateTimeUK(dateObj) {
+            if (!dateObj) return '';
+            const dd = String(dateObj.getDate()).padStart(2, '0');
+            const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const yy = String(dateObj.getFullYear()).slice(-2);
+            const hh = String(dateObj.getHours()).padStart(2, '0');
+            const min = String(dateObj.getMinutes()).padStart(2, '0');
+            const ss = String(dateObj.getSeconds()).padStart(2, '0');
+            return `${dd}/${mm}/${yy}, ${hh}:${min}:${ss}`;
+        }
+
         function performSearch() {
             const phone = document.getElementById('search-phone-input').value.trim();
             const container = document.getElementById('search-results');
@@ -1004,7 +1884,7 @@
                 container.innerHTML = `
                     <div class="bg-redbox-card p-4 rounded-2xl border border-redbox-border text-center text-xs text-gray-400">
                         <i class="fa-solid fa-triangle-exclamation text-amber-500 text-lg mb-1 block"></i>
-                        <span>No active liquor found for phone ${phone}</span>
+                        <span>No active liquor found for phone ${esc(phone)}</span>
                     </div>
                 `;
                 return;
@@ -1015,99 +1895,17 @@
                     <div class="flex items-center justify-between border-b border-redbox-border pb-2">
                         <div class="flex items-center space-x-2">
                             <span class="bg-red-600/30 text-rose-400 px-2 py-0.5 rounded text-xs font-mono font-bold">${b.id}</span>
-                            <span class="font-bold text-white text-xs">${b.name}</span>
+                            <span class="font-bold text-white text-xs">${esc(b.name)}</span>
                         </div>
                         <span class="text-[11px] text-emerald-400 bg-emerald-950/50 px-2 py-0.5 rounded border border-emerald-800/40">${b.status}</span>
                     </div>
                     <div class="text-xs text-gray-300 space-y-1">
-                        <div class="flex justify-between"><span class="text-gray-400">Liquor / 酒名:</span> <strong class="text-white">${b.bottle}</strong></div>
-                        <div class="flex justify-between"><span class="text-gray-400">Quantity / 数量:</span> <strong class="text-red-400">${b.qtyType === 'percent' ? b.qty + '%' : 'x' + b.qty}</strong></div>
-                        <div class="flex justify-between"><span class="text-gray-400">Room & Outlet:</span> <strong class="text-white">${b.room} (${b.outlet || 'General'})</strong></div>
-                        <div class="flex justify-between"><span class="text-gray-400">Expires / 有效期:</span> <strong class="text-amber-300 font-mono">${b.expiry}</strong></div>
+                        <div class="flex flex-col"><span class="text-gray-400 mb-0.5">Liquor / 酒水列表:</span> <div class="text-white">${b.bottleFormatted || b.bottle}</div></div>
+                        <div class="flex justify-between pt-1 border-t border-redbox-border/40"><span class="text-gray-400">Room & Outlet:</span> <strong class="text-white">${esc(b.room)} (${esc(b.outlet || 'General')})</strong></div>
+                        <div class="flex justify-between"><span class="text-gray-400">Expires / 有效期:</span> <strong class="text-amber-300 font-mono">${formatDateUK(b.expiry)}</strong></div>
                     </div>
                 </div>
             `).join('');
-        }
-
-        function updateWithdrawDropdown() {
-            const select = document.getElementById('withdraw-bottle-select');
-            if(!select) return;
-            const activeBottles = bottleVault.filter(b => b.qty > 0);
-            if(activeBottles.length === 0) {
-                select.innerHTML = `<option value="">No active bottles available</option>`;
-                return;
-            }
-            select.innerHTML = activeBottles.map(b => {
-                const qtyDisplay = b.qtyType === 'percent' ? `${b.qty}%` : `x${b.qty}`;
-                return `<option value="${b.id}">[${b.id}] ${b.name} - ${b.bottle} (Qty: ${qtyDisplay}, Room: ${b.room}, Outlet: ${b.outlet || 'General'})</option>`;
-            }).join('');
-        }
-
-        function handleWithdraw() {
-            const bottleSelect = document.getElementById('withdraw-bottle-select');
-            const outletSelect = document.getElementById('withdraw-outlet');
-            const qtyInput = document.getElementById('withdraw-qty');
-            const unitTypeSelect = document.getElementById('withdraw-unit-type');
-            const pinInput = document.getElementById('withdraw-staff-pin');
-
-            if (!bottleSelect || !outletSelect || !qtyInput || !unitTypeSelect || !pinInput) return;
-
-            const bottleId = bottleSelect.value;
-            const withdrawOutlet = outletSelect.value;
-            const withdrawQty = parseInt(qtyInput.value) || 1;
-            const withdrawUnitType = unitTypeSelect.value;
-            const staffPin = pinInput.value.trim();
-
-            if(!bottleId) {
-                showToast("Please select a bottle", "请选择要取走的存酒");
-                return;
-            }
-
-            const staff = staffList.find(s => s.pin === staffPin);
-            if(!staff) {
-                showToast("Invalid Staff PIN code!", "店员PIN密码错误或未授权！");
-                return;
-            }
-
-            const bottle = bottleVault.find(b => b.id === bottleId);
-            if(!bottle) return;
-
-            if (withdrawUnitType === 'percent' && bottle.qtyType === 'percent') {
-                if (withdrawQty > bottle.qty || withdrawQty < 1 || withdrawQty > 100) {
-                    showToast("Invalid percentage amount (1-100%)", "取走百分比必须在 1% 至 100% 之间且不超过剩余");
-                    return;
-                }
-                bottle.qty -= withdrawQty;
-                if (bottle.qty <= 0) bottle.status = 'Redeemed';
-            } else if (withdrawUnitType === 'bottle' && bottle.qtyType === 'bottle') {
-                if (withdrawQty > bottle.qty || withdrawQty < 1) {
-                    showToast("Cannot withdraw more than active qty", "取走数量不能大于在库剩余整瓶数量");
-                    return;
-                }
-                bottle.qty -= withdrawQty;
-                if(bottle.qty === 0) bottle.status = 'Redeemed';
-            } else {
-                if (withdrawQty > bottle.qty) {
-                    showToast("Cannot withdraw more than active qty", "取走数量超过当前在库余量");
-                    return;
-                }
-                bottle.qty -= withdrawQty;
-                if(bottle.qty <= 0) bottle.status = 'Redeemed';
-            }
-
-            const unitLabel = withdrawUnitType === 'percent' ? `${withdrawQty}%` : `${withdrawQty} bottles`;
-
-            historyLog.unshift({
-                id: 'LOG-' + Math.floor(Math.random()*999),
-                time: new Date().toLocaleString(),
-                type: 'WITHDRAW',
-                desc: `${staff.name} at [${withdrawOutlet}] verified PIN to withdraw ${unitLabel} of ${bottle.bottle} from ${bottle.name} (${bottle.room})`
-            });
-
-            pinInput.value = '';
-            updateWithdrawDropdown();
-            renderHistory();
-            showToast("Withdrawal successful!", "取酒核销成功，库存已扣减并记录分店流水！");
         }
 
         function openScannerModal(context) {
@@ -1121,7 +1919,7 @@
                 mockList.innerHTML = bottleVault.map(b => `
                     <button onclick="simulateScanResult('${b.id}')" class="bg-redbox-dark hover:bg-redbox-border border border-redbox-border p-2 rounded-xl text-left text-xs transition">
                         <strong class="text-red-400 font-mono">${b.id}</strong>
-                        <span class="text-gray-300 block truncate">${b.name}</span>
+                        <span class="text-gray-300 block truncate">${esc(b.name)} (${b.phone})</span>
                     </button>
                 `).join('');
             }
@@ -1181,13 +1979,14 @@
                 showToast("Scanned Vault: " + bottle.id, "扫码成功：已调出存酒档案");
             } else if (activeScannerContext === 'withdraw') {
                 switchTab('withdraw');
-                const select = document.getElementById('withdraw-bottle-select');
-                if(select) select.value = bottle.id;
-                showToast("Selected Bottle for Withdrawal", "已自动选中该瓶酒，请输入店员PIN取酒");
+                const phoneInput = document.getElementById('withdraw-phone-input');
+                if(phoneInput) phoneInput.value = bottle.phone;
+                searchWithdrawBottles(bottle.id);
             }
         }
 
         function renderHistory() {
+            updateExpiryMonthOptions();
             const container = document.getElementById('history-list');
             const outletFilterVal = document.getElementById('history-outlet-filter')?.value || 'ALL';
             const expiryFilterVal = document.getElementById('expiry-month-filter')?.value || 'ALL';
@@ -1197,16 +1996,16 @@
             let filtered = historyLog;
 
             if(outletFilterVal !== 'ALL') {
-                filtered = filtered.filter(item => item.desc.includes(outletFilterVal));
+                filtered = filtered.filter(item => item.outlet ? item.outlet === outletFilterVal : item.desc.includes(outletFilterVal));
             }
 
             if(expiryFilterVal !== 'ALL') {
                 filtered = filtered.filter(item => {
-                    const foundVault = bottleVault.find(b => item.desc.includes(b.name) || item.desc.includes(b.id));
-                    if(foundVault && foundVault.expiry) {
-                        return foundVault.expiry.startsWith(expiryFilterVal);
-                    }
-                    return false;
+                    const ids = item.vaultIds || [];
+                    return ids.some(id => {
+                        const v = bottleVault.find(b => b.id === id);
+                        return v && v.expiry && v.expiry.startsWith(expiryFilterVal);
+                    });
                 });
             }
 
@@ -1222,172 +2021,241 @@
 
             container.innerHTML = filtered.map(log => {
                 const isDeposit = log.type === 'DEPOSIT';
-                const badgeColor = isDeposit ? 'bg-rose-950/60 text-rose-400 border-rose-800/40' : 'bg-teal-950/60 text-teal-400 border-teal-800/40';
-                const icon = isDeposit ? 'fa-wine-bottle' : 'fa-hand-holding-medical';
+                const isWithdraw = log.type === 'WITHDRAW';
+                const badgeColor = isDeposit ? 'bg-rose-950/60 text-rose-400 border-rose-800/40' : (isWithdraw ? 'bg-teal-950/60 text-teal-400 border-teal-800/40' : 'bg-amber-950/60 text-amber-400 border-amber-800/40');
+                const icon = isDeposit ? 'fa-wine-bottle' : (isWithdraw ? 'fa-hand-holding-medical' : 'fa-shield-halved');
                 
-                // Find associated expiry date if available
-                const foundVault = bottleVault.find(b => log.desc.includes(b.name) || log.desc.includes(b.id));
-                const expiryBadge = foundVault && foundVault.expiry ? `<span class="text-[10px] text-amber-300 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-800/40 font-mono">Expires: ${foundVault.expiry}</span>` : '';
-
                 return `
-                    <div class="bg-redbox-card p-3.5 rounded-2xl border border-redbox-border space-y-2 shadow-sm">
+                    <div class="bg-redbox-card p-3 rounded-xl border border-redbox-border space-y-1.5 text-xs">
                         <div class="flex items-center justify-between">
-                            <span class="text-[10px] ${badgeColor} px-2 py-0.5 rounded border font-mono flex items-center space-x-1">
-                                <i class="fa-solid ${icon}"></i>
+                            <span class="${badgeColor} px-2 py-0.5 rounded text-[10px] font-bold border flex items-center space-x-1">
+                                <i class="fa-solid ${icon} text-[10px]"></i>
                                 <span>${log.type}</span>
                             </span>
-                            <div class="flex items-center space-x-2">
-                                ${expiryBadge}
-                                <span class="text-[10px] text-gray-500 font-mono">${log.time}</span>
-                            </div>
+                            <span class="text-[10px] text-gray-400 font-mono">${log.time}</span>
                         </div>
-                        <p class="text-xs text-gray-200 leading-relaxed">${log.desc}</p>
+                        <div class="text-gray-200 text-xs leading-relaxed">${log.desc}</div>
                     </div>
                 `;
             }).join('');
         }
 
         function exportAuditLog() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(historyLog, null, 2));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", "red_box_audit_log.json");
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-            showToast("Audit log exported successfully", "流水日志导出成功");
-        }
-
-        function handleAddLiquor(e) {
-            e.preventDefault();
-            const input = document.getElementById('liquor-name');
-            if(!input) return;
-            const val = input.value.trim();
-            if(val && !liquorBrands.includes(val)) {
-                liquorBrands.push(val);
-                input.value = '';
-                renderLiquorList();
-                showToast("Liquor brand added successfully", "新酒水品牌添加成功");
-            }
-        }
-
-        function renderLiquorList() {
-            const container = document.getElementById('liquor-list');
-            if(!container) return;
-            container.innerHTML = liquorBrands.map((b, idx) => `
-                <div class="flex items-center justify-between bg-redbox-dark p-2.5 rounded-xl border border-redbox-border text-xs text-white">
-                    <span class="font-medium">${b}</span>
-                    <button onclick="removeLiquor(${idx})" class="text-gray-400 hover:text-red-400 px-2 py-1 transition">
-                        <i class="fa-solid fa-trash text-xs"></i>
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        function removeLiquor(idx) {
-            if(liquorBrands.length <= 1) {
-                showToast("At least one liquor brand required", "至少需要保留一个酒水品牌");
+            if (historyLog.length === 0) {
+                showToast("No logs available to export", "暂无可导出的操作日志");
                 return;
             }
-            liquorBrands.splice(idx, 1);
-            renderLiquorList();
-            showToast("Liquor brand removed", "酒水品牌已删除");
+
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+            csvContent += "ID,Time,Type,Description\n";
+
+            historyLog.forEach(log => {
+                const cleanDesc = log.desc.replace(/<[^>]*>?/gm, ' ').replace(/"/g, '""');
+                csvContent += `"${log.id}","${log.time}","${log.type}","${cleanDesc}"\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `RED_BOX_Liquor_AuditLog_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast("Audit log exported to CSV!", "日志文件已导出为 CSV 格式！");
         }
 
-        function handleAddOutlet(e) {
-            e.preventDefault();
-            const nameInput = document.getElementById('outlet-name');
-            const codeInput = document.getElementById('outlet-code');
-            if(!nameInput || !codeInput) return;
-
-            const name = nameInput.value.trim();
-            const code = codeInput.value.trim().toUpperCase();
-
-            if(name && code) {
-                outletList.push({ id: 'O-' + Date.now(), name, code });
-                nameInput.value = '';
-                codeInput.value = '';
-                renderOutletList();
-                updateOutletDropdowns();
-                showToast("Outlet added successfully", "分店添加成功");
-            }
-        }
-
-        function renderOutletList() {
-            const container = document.getElementById('outlet-list');
+        // Staff Management Functions
+        function renderStaffList() {
+            const container = document.getElementById('staff-list');
             if(!container) return;
-            container.innerHTML = outletList.map((o, idx) => `
-                <div class="flex items-center justify-between bg-redbox-dark p-2.5 rounded-xl border border-redbox-border text-xs text-white">
+
+            container.innerHTML = staffList.map(s => `
+                <div class="bg-redbox-dark p-2.5 rounded-xl border border-redbox-border flex items-center justify-between text-xs">
                     <div>
-                        <strong class="text-red-400 font-mono">[${o.code}]</strong>
-                        <span class="font-medium ml-1">${o.name}</span>
+                        <strong class="text-white block font-medium">${esc(s.name)}</strong>
+                        <span class="text-[10px] text-gray-400">${esc(s.role)} • PIN: ••••</span>
                     </div>
-                    <button onclick="removeOutlet(${idx})" class="text-gray-400 hover:text-red-400 px-2 py-1 transition">
-                        <i class="fa-solid fa-trash text-xs"></i>
-                    </button>
+                    <div class="flex items-center space-x-1.5">
+                        <button onclick="openEditStaffModal('${s.id}')" class="bg-redbox-card hover:bg-redbox-border text-rose-400 px-2 py-1 rounded-lg border border-redbox-border text-[11px] transition flex items-center space-x-1">
+                            <i class="fa-solid fa-key text-[10px]"></i>
+                            <span>${t2('重置密码','Reset PIN')}</span>
+                        </button>
+                        <button onclick="handleDeleteStaff('${s.id}')" class="text-gray-400 hover:text-red-400 p-1.5 transition">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </button>
+                    </div>
                 </div>
             `).join('');
-        }
-
-        function removeOutlet(idx) {
-            if(outletList.length <= 1) {
-                showToast("At least one outlet required", "至少需要保留一个分店");
-                return;
-            }
-            outletList.splice(idx, 1);
-            renderOutletList();
-            updateOutletDropdowns();
-            showToast("Outlet removed", "分店已删除");
         }
 
         function handleAddStaff(e) {
             e.preventDefault();
-            const nameInput = document.getElementById('staff-name');
-            const pinInput = document.getElementById('staff-pin');
-            const roleInput = document.getElementById('staff-role');
-            if(!nameInput || !pinInput) return;
+            const name = document.getElementById('staff-name').value.trim();
+            const pin = document.getElementById('staff-pin').value.trim();
+            const role = document.getElementById('staff-role').value.trim() || 'Staff';
 
-            const name = nameInput.value.trim();
-            const pin = pinInput.value.trim();
-            const role = roleInput.value.trim() || 'Floor Staff / 服务员';
+            if(!name || !pin) {
+                showToast("Please fill in name and PIN", "请填写员工姓名和4位密码！");
+                return;
+            }
 
-            if(name && pin.length === 4) {
-                staffList.push({ id: 'S-' + Date.now(), name, pin, role });
-                nameInput.value = '';
-                pinInput.value = '';
-                roleInput.value = '';
+            const newStaff = {
+                id: 'S-' + Date.now(),
+                name,
+                pinHash: hashPin(pin),
+                role
+            };
+
+            staffList.push(newStaff);
+            document.getElementById('staff-form').reset();
+            renderStaffList();
+            showToast("Staff authorized successfully", "已成功添加并授权新店员！");
+        }
+
+        function openEditStaffModal(staffId) {
+            const staff = staffList.find(s => s.id === staffId);
+            if (!staff) return;
+
+            document.getElementById('edit-staff-id').value = staff.id;
+            document.getElementById('edit-staff-name').value = staff.name;
+            document.getElementById('edit-staff-pin-input').value = '';
+
+            const modal = document.getElementById('edit-staff-modal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeEditStaffModal() {
+            const modal = document.getElementById('edit-staff-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function handleSaveStaffPin(e) {
+            e.preventDefault();
+            const staffId = document.getElementById('edit-staff-id').value;
+            const newPin = document.getElementById('edit-staff-pin-input').value.trim();
+
+            if (!newPin || newPin.length < 4) {
+                showToast("PIN must be at least 4 digits", "密码必须至少为 4 位！");
+                return;
+            }
+
+            const staff = staffList.find(s => s.id === staffId);
+            if (staff) {
+                staff.pinHash = hashPin(newPin);
+                closeEditStaffModal();
                 renderStaffList();
-                showToast("Staff PIN added successfully", "授权员工与PIN密码添加成功");
-            } else {
-                showToast("PIN must be exactly 4 digits", "PIN密码必须为4位数字");
+                showToast(`Reset PIN for ${staff.name}`, `已成功重置 ${staff.name} 的授权密码！`);
             }
         }
 
-        function renderStaffList() {
-            const container = document.getElementById('staff-list');
+        function handleDeleteStaff(staffId) {
+            if (staffList.length <= 1) {
+                showToast("Cannot delete last authorized staff", "至少需保留一名已授权店员！");
+                return;
+            }
+            staffList = staffList.filter(s => s.id !== staffId);
+            renderStaffList();
+            showToast("Staff removed", "已移除该员工授权");
+        }
+
+        // Liquor Brands Management Functions
+        function renderLiquorList() {
+            const container = document.getElementById('liquor-list');
             if(!container) return;
-            container.innerHTML = staffList.map((s, idx) => `
-                <div class="flex items-center justify-between bg-redbox-dark p-2.5 rounded-xl border border-redbox-border text-xs text-white">
-                    <div>
-                        <span class="font-bold text-white">${s.name}</span>
-                        <span class="text-gray-400 ml-1">(${s.role})</span>
-                        <span class="bg-redbox-card px-1.5 py-0.5 rounded font-mono text-red-400 ml-2 border border-redbox-border">PIN: ****</span>
-                    </div>
-                    <button onclick="removeStaff(${idx})" class="text-gray-400 hover:text-red-400 px-2 py-1 transition">
-                        <i class="fa-solid fa-trash text-xs"></i>
+
+            container.innerHTML = liquorBrands.map((brand, idx) => `
+                <div class="bg-redbox-dark p-2.5 rounded-xl border border-redbox-border flex items-center justify-between text-xs">
+                    <span class="text-white font-medium">${esc(brand)}</span>
+                    <button onclick="handleDeleteLiquor(${idx})" class="text-gray-400 hover:text-red-400 p-1.5 transition">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
                     </button>
                 </div>
             `).join('');
         }
 
-        function removeStaff(idx) {
-            if(staffList.length <= 1) {
-                showToast("At least one staff required", "至少需要保留一个授权管理员");
+        function handleAddLiquor(e) {
+            e.preventDefault();
+            const name = document.getElementById('liquor-name').value.trim();
+
+            if(!name) {
+                showToast("Please enter liquor name", "请输入酒品名称！");
                 return;
             }
-            staffList.splice(idx, 1);
-            renderStaffList();
-            showToast("Staff removed", "员工授权已移除");
+
+            if(liquorBrands.includes(name)) {
+                showToast("Liquor already exists", "该酒品已在列表中！");
+                return;
+            }
+
+            liquorBrands.push(name);
+            document.getElementById('liquor-form').reset();
+            renderLiquorList();
+            refreshDepositLiquorDropdowns();
+            showToast("Liquor brand added successfully", "新酒品名称添加成功！");
+        }
+
+        function handleDeleteLiquor(index) {
+            if (liquorBrands.length <= 1) {
+                showToast("Cannot delete last liquor brand", "至少需保留一种酒品名称！");
+                return;
+            }
+            liquorBrands.splice(index, 1);
+            renderLiquorList();
+            refreshDepositLiquorDropdowns();
+            showToast("Liquor removed", "已移除该酒品名称");
+        }
+
+        // Outlet Management Functions
+        function renderOutletList() {
+            const container = document.getElementById('outlet-list');
+            if(!container) return;
+
+            container.innerHTML = outletList.map(o => `
+                <div class="bg-redbox-dark p-2.5 rounded-xl border border-redbox-border flex items-center justify-between text-xs">
+                    <div>
+                        <strong class="text-white block font-medium">${esc(o.name)}</strong>
+                        <span class="text-[10px] text-gray-400">Code: ${esc(o.code)}</span>
+                    </div>
+                    <button onclick="handleDeleteOutlet('${o.id}')" class="text-gray-400 hover:text-red-400 p-1.5 transition">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function handleAddOutlet(e) {
+            e.preventDefault();
+            const name = document.getElementById('outlet-name').value.trim();
+            const code = document.getElementById('outlet-code').value.trim().toUpperCase();
+
+            if(!name || !code) {
+                showToast("Please fill in name and code", "请填写门店名称和简写代码！");
+                return;
+            }
+
+            const newOutlet = {
+                id: 'O-' + Date.now(),
+                name,
+                code
+            };
+
+            outletList.push(newOutlet);
+            document.getElementById('outlet-form').reset();
+            renderOutletList();
+            updateOutletDropdowns();
+            showToast("New outlet added successfully", "新分店门店添加成功！");
+        }
+
+        function handleDeleteOutlet(outletId) {
+            if (outletList.length <= 1) {
+                showToast("Cannot delete last registered outlet", "至少需保留一家分店门店！");
+                return;
+            }
+            outletList = outletList.filter(o => o.id !== outletId);
+            renderOutletList();
+            updateOutletDropdowns();
+            showToast("Outlet removed", "已删除分店门店");
         }
     </script>
 </body>
